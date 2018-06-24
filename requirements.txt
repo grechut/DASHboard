@@ -5,3 +5,4 @@ dash-renderer==0.12.1
 jupyter==1.0.0
 pandas==0.22.0
 plotly==2.5.1
+xlrd==1.1.0
