@@ -1,21 +1,25 @@
 """
-- play/pause interval
-- size of bubble => dropdown selection
-- color of bubble => color of continent
-- map of the world => legend for color continents
+- better state management
+    - how to do first render?
+    - how to properly keep state?
+    - how to propagate state so that we do not have callback hell?
 
-- multi choice of countires
+- play/pause interval
+
+Country
 - selected countries get label
-- search for countries
 
 - make size value more dynamic (not population only)
 
+
+Optional:
 - color hue
+- color of bubble => color of continent
+- map of the world => legend for color continents
 
-- how to properly keep state?
-    how to propagate state so that we do not have callback hell?
+Other quesitons:
+- how to deal with dynamic data and selections?
 
-- make it look better
 """
 
 import dash
@@ -27,6 +31,7 @@ import pandas as pd
 import numpy as np
 
 from data import load_data
+from app_utils import MarkerSize, options
 
 
 TITLE = "Poor man's Gapminder"
@@ -34,9 +39,10 @@ TOTAL_POPULATION = "Total population"
 
 # Loading data
 data = load_data()
-data_keys = list(data.keys())
+DATA_CHOICES = list(data.keys())
 
 population_df = data[TOTAL_POPULATION]
+COUNTRIES = list(population_df.index)
 
 # Creating app
 app = dash.Dash(__name__)
@@ -66,15 +72,32 @@ app.layout = html.Div(
                 html.Label("Year"),
                 html.Div([dcc.Slider(id="year_slider")], id="year_slider_container"),
                 html.Div(
+                    className="row",
                     children=[
-                        html.Label("Y Axis"),
-                        dcc.Dropdown(
-                            id="y_axis_selection",
-                            options=[{"label": k, "value": k} for k in data_keys],
-                            value=data_keys[2],
+                        html.Div(
+                            className="col s12 m6 l6",
+                            children=[
+                                html.Label("Y Axis"),
+                                dcc.Dropdown(
+                                    id="y_axis_selection",
+                                    options=options(DATA_CHOICES),
+                                    value=DATA_CHOICES[2],
+                                ),
+                            ],
+                        ),
+                        html.Div(
+                            className="col s12 m6 l6",
+                            children=[
+                                html.Label("Countries"),
+                                dcc.Dropdown(
+                                    id="countries_selection",
+                                    options=options(COUNTRIES),
+                                    value=[],
+                                    multi=True,
+                                ),
+                            ],
                         ),
                     ],
-                    style={"width": "400px"},
                 ),
             ],
             style={"margin": "0 20px"},
@@ -86,11 +109,11 @@ app.layout = html.Div(
                 html.Label("X Axis"),
                 dcc.Dropdown(
                     id="x_axis_selection",
-                    options=[{"label": k, "value": k} for k in data_keys],
-                    value=data_keys[1],
+                    options=options(DATA_CHOICES),
+                    value=DATA_CHOICES[1],
                 ),
             ],
-            style={"width": "400px"},
+            style={"width": "300px"},
         ),
     ]
 )
@@ -125,11 +148,15 @@ def update_year_slider(x_axis_selection, y_axis_selection):
         Input(component_id="x_axis_selection", component_property="value"),
         Input(component_id="y_axis_selection", component_property="value"),
         Input(component_id="year_slider", component_property="value"),
+        Input(component_id="countries_selection", component_property="value"),
     ],
 )
-def update_chart(x_axis_selection, y_axis_selection, year):
+def update_chart(x_axis_selection, y_axis_selection, year, countries_selection):
     if not x_axis_selection or not y_axis_selection or not year:
         return
+
+    if not countries_selection:
+        countries_selection = COUNTRIES
 
     year = str(year)
     marker_size = MarkerSize(population_df[year])
@@ -137,36 +164,22 @@ def update_chart(x_axis_selection, y_axis_selection, year):
     return {
         "data": [
             go.Scatter(
-                x=[data[x_axis_selection].loc[idx, year]],
-                y=[data[y_axis_selection].loc[idx, year]],
+                x=[data[x_axis_selection].loc[country, year]],
+                y=[data[y_axis_selection].loc[country, year]],
                 mode="markers",  # "markers+text" for labels
-                textposition="top right",
-                text=[idx],
+                # textposition="top right",
+                text=[country],
                 # Is it okay to just log or do we need to scale?
-                marker={"size": marker_size.size(row[year])},
+                marker={"size": marker_size.size(population_df.loc[country, year])},
                 name="",  # hide trace-39 etc
             )
-            for idx, row in population_df.iterrows()
-            if idx in data[x_axis_selection].index
-            and idx in data[y_axis_selection].index
+            for country in COUNTRIES
+            if country in countries_selection
+            and country in data[x_axis_selection].index
+            and country in data[y_axis_selection].index
         ],
         "layout": {"title": year, "showlegend": False},
     }
-
-
-# Utils
-
-# Very much POC, rethink.
-# Prolly we need log as it will display more fair
-class MarkerSize:
-    def __init__(self, values, max_size=30):
-        self.min_val = values.min()
-        self.max_val = values.max()
-        self.max_size = max_size
-
-    def size(self, value):
-        scaled = (value - self.min_val) / self.max_val
-        return scaled * self.max_size
 
 
 if __name__ == "__main__":
