@@ -29,15 +29,19 @@ import numpy as np
 from data import load_data
 
 
+TITLE = "Poor man's Gapminder"
+TOTAL_POPULATION = "Total population"
+
+
 data = load_data()
 data_keys = list(data.keys())
 
-
-TOTAL_POPULATION = "Total population"
 population_df = data[TOTAL_POPULATION]
 
 
 app = dash.Dash(__name__)
+app.title = TITLE
+
 app.layout = html.Div(
     [
         html.H1("Bubbles"),
