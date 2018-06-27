@@ -155,10 +155,9 @@ def update_chart(x_axis_selection, y_axis_selection, year, countries_selection):
     if not x_axis_selection or not y_axis_selection or not year:
         return
 
-    if not countries_selection:
-        countries_selection = COUNTRIES
-
+    countries = countries_selection or COUNTRIES
     year = str(year)
+
     marker_size = MarkerSize(population_df[year])
 
     return {
@@ -166,16 +165,15 @@ def update_chart(x_axis_selection, y_axis_selection, year, countries_selection):
             go.Scatter(
                 x=[data[x_axis_selection].loc[country, year]],
                 y=[data[y_axis_selection].loc[country, year]],
-                mode="markers",  # "markers+text" for labels
-                # textposition="top right",
+                mode="markers+text" if countries_selection else "markers",
+                textposition="top center" if countries_selection else None,
                 text=[country],
                 # Is it okay to just log or do we need to scale?
                 marker={"size": marker_size.size(population_df.loc[country, year])},
                 name="",  # hide trace-39 etc
             )
-            for country in COUNTRIES
-            if country in countries_selection
-            and country in data[x_axis_selection].index
+            for country in countries
+            if country in data[x_axis_selection].index
             and country in data[y_axis_selection].index
         ],
         "layout": {"title": year, "showlegend": False},
