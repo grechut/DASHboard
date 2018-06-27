@@ -32,38 +32,71 @@ from data import load_data
 TITLE = "Poor man's Gapminder"
 TOTAL_POPULATION = "Total population"
 
-
+# Loading data
 data = load_data()
 data_keys = list(data.keys())
 
 population_df = data[TOTAL_POPULATION]
 
-
+# Creating app
 app = dash.Dash(__name__)
 app.title = TITLE
 
+
+# Materialize, not sure what to use
+external_css = [
+    "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"
+]
+for css in external_css:
+    app.css.append_css({"external_url": css})
+external_js = [
+    "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"
+]
+for js in external_js:
+    app.scripts.append_script({"external_url": js})
+
+
+# Layout
 app.layout = html.Div(
     [
-        html.H1("Bubbles"),
-        html.Label("X Axis"),
-        dcc.Dropdown(
-            id="x_axis_selection",
-            options=[{"label": k, "value": k} for k in data_keys],
-            value=data_keys[0],
+        html.Div(
+            className="row",
+            children=[
+                html.H1("Bubbles"),
+                html.Label("Year"),
+                html.Div([dcc.Slider(id="year_slider")], id="year_slider_container"),
+                html.Div(
+                    children=[
+                        html.Label("Y Axis"),
+                        dcc.Dropdown(
+                            id="y_axis_selection",
+                            options=[{"label": k, "value": k} for k in data_keys],
+                            value=data_keys[2],
+                        ),
+                    ],
+                    style={"width": "400px"},
+                ),
+            ],
+            style={"margin": "0 20px"},
         ),
-        html.Label("Y Axis"),
-        dcc.Dropdown(
-            id="y_axis_selection",
-            options=[{"label": k, "value": k} for k in data_keys],
-            value=data_keys[1],
+        html.Div(className="row", children=[dcc.Graph(id="main_chart")]),
+        html.Div(
+            className="row",
+            children=[
+                html.Label("X Axis"),
+                dcc.Dropdown(
+                    id="x_axis_selection",
+                    options=[{"label": k, "value": k} for k in data_keys],
+                    value=data_keys[1],
+                ),
+            ],
+            style={"width": "400px"},
         ),
-        html.Label("Year"),
-        html.Div([dcc.Slider(id="year_slider")], id="year_slider_container"),
-        dcc.Graph(id="main_chart"),
     ]
 )
 
 
+# Callbacks
 @app.callback(
     Output("year_slider_container", "children"),
     [
@@ -120,6 +153,8 @@ def update_chart(x_axis_selection, y_axis_selection, year):
         "layout": {"title": year, "showlegend": False},
     }
 
+
+# Utils
 
 # Very much POC, rethink.
 # Prolly we need log as it will display more fair
