@@ -1,4 +1,7 @@
 """
+- format value
+- remove "trace x"
+
 - play/pause interval
 - size of bubble => dropdown selection
 - color of bubble => color of continent
@@ -8,7 +11,12 @@
 - selected countries get label
 - search for countries
 
+- make size value more dynamic (not population only)
+
 - color hue
+
+- how to properly keep state?
+    how to propagate state so that we do not have callback hell?
 
 - make it look better
 """
@@ -19,12 +27,18 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
+import numpy as np
 
 from data import load_data
 
 
 data = load_data()
 data_keys = list(data.keys())
+
+
+TOTAL_POPULATION = "Total population"
+population_df = data[TOTAL_POPULATION]
+
 
 app = dash.Dash(__name__)
 app.layout = html.Div(
@@ -84,18 +98,38 @@ def update_chart(x_axis_selection, y_axis_selection, year):
         return
 
     year = str(year)
+    marker_size = MarkerSize(population_df[year])
 
     return {
         "data": [
             go.Scatter(
-                x=data[x_axis_selection][year],
-                y=data[y_axis_selection][year],
+                x=[data[x_axis_selection].loc[idx, year]],
+                y=[data[y_axis_selection].loc[idx, year]],
                 mode="markers+text",
-                text=data[x_axis_selection][year].index,
+                textposition="top right",
+                text=[idx],
+                # Is it okay to just log or do we need to scale?
+                marker={"size": marker_size.size(row[year])},
             )
+            for idx, row in population_df.iterrows()
+            if idx in data[x_axis_selection].index
+            and idx in data[y_axis_selection].index
         ],
-        "layout": {"title": year},
+        "layout": {"title": year, "showlegend": False},
     }
+
+
+# Very much POC, rethink.
+# Prolly we need log as it will display more fair
+class MarkerSize:
+    def __init__(self, values, max_size=30):
+        self.min_val = values.min()
+        self.max_val = values.max()
+        self.max_size = max_size
+
+    def size(self, value):
+        scaled = (value - self.min_val) / self.max_val
+        return scaled * self.max_size
 
 
 if __name__ == "__main__":
