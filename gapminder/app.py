@@ -1,5 +1,4 @@
 """
-- year slider FIX MEEE
 - play/pause interval
 - size of bubble => dropdown selection
 - color of bubble => color of continent
@@ -61,18 +60,14 @@ def update_year_slider(x_axis_selection, y_axis_selection):
     if not x_axis_selection or not y_axis_selection:
         return []
 
-    min_value = max([data[x_axis_selection].min(), data[y_axis_selection].min()])
-    max_value = min([data[x_axis_selection].max(), data[y_axis_selection].max()])
+    x_years = [int(c) for c in data[x_axis_selection]]
+    y_years = [int(c) for c in data[y_axis_selection]]
+
+    min_value = max([x_years[0], y_years[0]])
+    max_value = min([x_years[-1], y_years[-1]])
 
     return (
-        dcc.Slider(
-            id="year_slider",
-            min=min_value,
-            max=max_value,
-            # step=1,
-            value=max_value,
-            marks={year: str(year) for year in range(min_value, max_value + 1)},
-        ),
+        dcc.Slider(id="year_slider", min=min_value, max=max_value, value=max_value),
     )
 
 
