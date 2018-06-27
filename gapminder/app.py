@@ -1,7 +1,4 @@
 """
-- format value
-- remove "trace x"
-
 - play/pause interval
 - size of bubble => dropdown selection
 - color of bubble => color of continent
@@ -110,6 +107,7 @@ def update_chart(x_axis_selection, y_axis_selection, year):
                 text=[idx],
                 # Is it okay to just log or do we need to scale?
                 marker={"size": marker_size.size(row[year])},
+                name="",  # hide trace-39 etc
             )
             for idx, row in population_df.iterrows()
             if idx in data[x_axis_selection].index
