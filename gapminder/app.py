@@ -6,9 +6,6 @@
 
 - play/pause interval
 
-Country
-- selected countries get label
-
 - make size value more dynamic (not population only)
 
 
