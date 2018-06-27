@@ -139,7 +139,7 @@ def update_chart(x_axis_selection, y_axis_selection, year):
             go.Scatter(
                 x=[data[x_axis_selection].loc[idx, year]],
                 y=[data[y_axis_selection].loc[idx, year]],
-                mode="markers+text",
+                mode="markers",  # "markers+text" for labels
                 textposition="top right",
                 text=[idx],
                 # Is it okay to just log or do we need to scale?
