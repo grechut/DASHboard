@@ -2,7 +2,6 @@
 - filter data properly for what is possible to be seen on the chart
     (before we calculate min and max)
 
-
 - bubble size mathematically correct
 
 - set properly height/width
@@ -13,12 +12,11 @@
 
 - play/pause interval
 
-- make size value more dynamic (not population only)
-
 
 Optional:
 - color hue
 - color of bubble => color of continent
+- more than population for bubble size
 - present dots from previously selected year
 
 - map of the world => legend for color continents
