@@ -1,8 +1,8 @@
 """
-- do min / max buffer
+- log/linear
+- bubble size mathematically correct
 
 - better state management
-    - how to do first render?
     - how to properly keep state?
     - how to propagate state so that we do not have callback hell?
 
@@ -32,7 +32,7 @@ import pandas as pd
 import numpy as np
 
 from data import load_data
-from app_utils import MarkerSize, options
+from app_utils import MarkerSize, options, get_range
 
 
 TITLE = "Poor man's Gapminder"
@@ -190,18 +190,8 @@ def update_chart(
         "layout": {
             "title": year,
             "showlegend": False,
-            "xaxis": {
-                "range": [
-                    data[x_axis_selection].min().min(),
-                    data[x_axis_selection].max().max(),
-                ]
-            },
-            "yaxis": {
-                "range": [
-                    data[y_axis_selection].min().min(),
-                    data[y_axis_selection].max().max(),
-                ]
-            },
+            "xaxis": {"range": get_range(data[x_axis_selection])},
+            "yaxis": {"range": get_range(data[y_axis_selection])},
         },
     }
 
