@@ -1,6 +1,11 @@
 """
-- log/linear
+- filter data properly for what is possible to be seen on the chart
+    (before we calculate min and max)
+
+
 - bubble size mathematically correct
+
+- set properly height/width
 
 - better state management
     - how to properly keep state?
@@ -32,7 +37,7 @@ import pandas as pd
 import numpy as np
 
 from data import load_data
-from app_utils import MarkerSize, options, get_range
+from app_utils import MarkerSize, options, get_axis
 
 
 TITLE = "Poor man's Gapminder"
@@ -41,7 +46,6 @@ TOTAL_POPULATION = "Total population"
 # Loading data
 data = load_data()
 DATA_CHOICES = list(data.keys())
-
 population_df = data[TOTAL_POPULATION]
 COUNTRIES = list(population_df.index)
 
@@ -69,7 +73,7 @@ app.layout = html.Div(
         html.Div(
             className="row",
             children=[
-                html.H1("Bubbles"),
+                html.H6("Bubbles"),
                 html.Div([dcc.Slider(id="year_slider")], id="year_slider_container"),
                 html.Div(
                     className="row",
@@ -138,7 +142,8 @@ def update_year_slider(x_axis_selection, y_axis_selection):
     min_value = max([x_years[0], y_years[0]])
     max_value = min([x_years[-1], y_years[-1]])
 
-    return (
+    return [
+        html.Label("Year"),
         dcc.Slider(
             id="year_slider",
             min=min_value,
@@ -146,7 +151,7 @@ def update_year_slider(x_axis_selection, y_axis_selection):
             value=max_value,
             updatemode="drag",
         ),
-    )
+    ]
 
 
 @app.callback(
@@ -190,8 +195,9 @@ def update_chart(
         "layout": {
             "title": year,
             "showlegend": False,
-            "xaxis": {"range": get_range(data[x_axis_selection])},
-            "yaxis": {"range": get_range(data[y_axis_selection])},
+            "xaxis": get_axis(data[x_axis_selection]),
+            "yaxis": get_axis(data[y_axis_selection]),
+            "height": "600px",
         },
     }
 
