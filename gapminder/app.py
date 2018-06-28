@@ -12,6 +12,8 @@
 
 - play/pause interval
 
+- add 2nd chart, e.g. with distributions
+
 
 Optional:
 - color hue
