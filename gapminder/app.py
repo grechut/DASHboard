@@ -1,4 +1,6 @@
 """
+- do min / max buffer
+
 - better state management
     - how to do first render?
     - how to properly keep state?
@@ -12,11 +14,13 @@
 Optional:
 - color hue
 - color of bubble => color of continent
+- present dots from previously selected year
+
 - map of the world => legend for color continents
 
 Other quesitons:
 - how to deal with dynamic data and selections?
-
+- what is order of callbacks doing?
 """
 
 import dash
@@ -66,7 +70,6 @@ app.layout = html.Div(
             className="row",
             children=[
                 html.H1("Bubbles"),
-                html.Label("Year"),
                 html.Div([dcc.Slider(id="year_slider")], id="year_slider_container"),
                 html.Div(
                     className="row",
@@ -118,6 +121,7 @@ app.layout = html.Div(
 
 # Callbacks
 @app.callback(
+    # year_slider_container needed because we need to update multiple properties of slider
     Output("year_slider_container", "children"),
     [
         Input(component_id="x_axis_selection", component_property="value"),
@@ -135,7 +139,13 @@ def update_year_slider(x_axis_selection, y_axis_selection):
     max_value = min([x_years[-1], y_years[-1]])
 
     return (
-        dcc.Slider(id="year_slider", min=min_value, max=max_value, value=max_value),
+        dcc.Slider(
+            id="year_slider",
+            min=min_value,
+            max=max_value,
+            value=max_value,
+            updatemode="drag",
+        ),
     )
 
 
@@ -144,11 +154,15 @@ def update_year_slider(x_axis_selection, y_axis_selection):
     [
         Input(component_id="x_axis_selection", component_property="value"),
         Input(component_id="y_axis_selection", component_property="value"),
+        # Workaround for proper detection of callback dependencies
+        Input(component_id="year_slider_container", component_property="children"),
         Input(component_id="year_slider", component_property="value"),
         Input(component_id="countries_selection", component_property="value"),
     ],
 )
-def update_chart(x_axis_selection, y_axis_selection, year, countries_selection):
+def update_chart(
+    x_axis_selection, y_axis_selection, year_container, year, countries_selection
+):
     if not x_axis_selection or not y_axis_selection or not year:
         return
 
@@ -173,7 +187,22 @@ def update_chart(x_axis_selection, y_axis_selection, year, countries_selection):
             if country in data[x_axis_selection].index
             and country in data[y_axis_selection].index
         ],
-        "layout": {"title": year, "showlegend": False},
+        "layout": {
+            "title": year,
+            "showlegend": False,
+            "xaxis": {
+                "range": [
+                    data[x_axis_selection].min().min(),
+                    data[x_axis_selection].max().max(),
+                ]
+            },
+            "yaxis": {
+                "range": [
+                    data[y_axis_selection].min().min(),
+                    data[y_axis_selection].max().max(),
+                ]
+            },
+        },
     }
 
 

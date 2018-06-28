@@ -10,6 +10,7 @@ def load_data():
         df = df.set_index(df.columns[0])
         # Some files got strings, some ints, why?
         df.columns = df.columns.astype(str)
+        df = df.dropna(axis="columns", how="all")
         data[df.index.name] = df
 
     return data
