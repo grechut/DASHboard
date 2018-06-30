@@ -1,7 +1,4 @@
 """
-- filter data properly for what is possible to be seen on the chart
-    (before we calculate min and max)
-
 - bubble size mathematically correct
 
 - set properly height/width
@@ -36,7 +33,10 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 
-from data import load_data
+from data import (
+    load_data,
+    prepare_data,
+)
 from app_utils import MarkerSize, options, get_axis
 
 
@@ -46,8 +46,14 @@ TOTAL_POPULATION = "Total population"
 # Loading data
 data = load_data()
 DATA_CHOICES = list(data.keys())
-population_df = data[TOTAL_POPULATION]
-COUNTRIES = list(population_df.index)
+
+DEFAULT_X_AXIS = DATA_CHOICES[1]
+DEFAULT_Y_AXIS = DATA_CHOICES[2]
+
+config = prepare_data(
+    data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS,
+)
+
 
 # Creating app
 app = dash.Dash(__name__)
@@ -74,7 +80,16 @@ app.layout = html.Div(
             className="row",
             children=[
                 html.H6("Bubbles"),
-                html.Div([dcc.Slider(id="year_slider")], id="year_slider_container"),
+                html.Div(
+                    className="row",
+                    children=[
+                        html.Div(
+                            className="col l12",
+                            children=[dcc.Slider(id="year_slider")],
+                            id="year_slider_container",
+                        ),
+                    ]
+                ),
                 html.Div(
                     className="row",
                     children=[
@@ -85,7 +100,7 @@ app.layout = html.Div(
                                 dcc.Dropdown(
                                     id="y_axis_selection",
                                     options=options(DATA_CHOICES),
-                                    value=DATA_CHOICES[2],
+                                    value=DEFAULT_Y_AXIS,
                                 ),
                             ],
                         ),
@@ -95,7 +110,7 @@ app.layout = html.Div(
                                 html.Label("Countries"),
                                 dcc.Dropdown(
                                     id="countries_selection",
-                                    options=options(COUNTRIES),
+                                    options=options(config['countries']),
                                     value=[],
                                     multi=True,
                                 ),
@@ -114,7 +129,7 @@ app.layout = html.Div(
                 dcc.Dropdown(
                     id="x_axis_selection",
                     options=options(DATA_CHOICES),
-                    value=DATA_CHOICES[1],
+                    value=DEFAULT_X_AXIS,
                 ),
             ],
             style={"width": "300px"},
@@ -130,26 +145,32 @@ app.layout = html.Div(
     [
         Input(component_id="x_axis_selection", component_property="value"),
         Input(component_id="y_axis_selection", component_property="value"),
+        Input(component_id="countries_selection", component_property="value"),
     ],
 )
-def update_year_slider(x_axis_selection, y_axis_selection):
+def update_year_slider(x_axis_selection, y_axis_selection, countries_selection):
     if not x_axis_selection or not y_axis_selection:
         return []
 
-    x_years = [int(c) for c in data[x_axis_selection]]
-    y_years = [int(c) for c in data[y_axis_selection]]
+    config = prepare_data(
+        data, x_axis_selection, y_axis_selection, countries_selection,
+    )
+    years = config['years']
 
-    min_value = max([x_years[0], y_years[0]])
-    max_value = min([x_years[-1], y_years[-1]])
+    marks = {i: year for i, year in enumerate(years)}
+    if len(years) > 30:
+        marks = {i: year if i % 5 == 0 else '' for i, year in enumerate(years)}
 
     return [
         html.Label("Year"),
         dcc.Slider(
             id="year_slider",
-            min=min_value,
-            max=max_value,
-            value=max_value,
+            min=0,
+            max=len(years)-1,
+            value=len(years)-1,
+            marks=marks,
             updatemode="drag",
+            dots=False,
         ),
     ]
 
@@ -166,37 +187,41 @@ def update_year_slider(x_axis_selection, y_axis_selection):
     ],
 )
 def update_chart(
-    x_axis_selection, y_axis_selection, year_container, year, countries_selection
+    x_axis_selection, y_axis_selection, year_container, year,
+    countries_selection,
 ):
     if not x_axis_selection or not y_axis_selection or not year:
         return
 
-    countries = countries_selection or COUNTRIES
-    year = str(year)
+    config = prepare_data(
+        data, x_axis_selection, y_axis_selection, countries_selection,
+    )
+    selected_year = config['years'][year]
 
-    marker_size = MarkerSize(population_df[year])
-
+    marker_size = MarkerSize(config['z_df'][selected_year])
     return {
         "data": [
             go.Scatter(
-                x=[data[x_axis_selection].loc[country, year]],
-                y=[data[y_axis_selection].loc[country, year]],
+                x=[config['x_df'].loc[country, selected_year]],
+                y=[config['y_df'].loc[country, selected_year]],
                 mode="markers+text" if countries_selection else "markers",
                 textposition="top center" if countries_selection else None,
                 text=[country],
                 # Is it okay to just log or do we need to scale?
-                marker={"size": marker_size.size(population_df.loc[country, year])},
+                marker={
+                    "size": marker_size.size(
+                        config['z_df'].loc[country, selected_year]
+                    )
+                },
                 name="",  # hide trace-39 etc
             )
-            for country in countries
-            if country in data[x_axis_selection].index
-            and country in data[y_axis_selection].index
+            for country in config['countries']
         ],
         "layout": {
-            "title": year,
+            "title": selected_year,
             "showlegend": False,
-            "xaxis": get_axis(data[x_axis_selection]),
-            "yaxis": get_axis(data[y_axis_selection]),
+            "xaxis": get_axis(config['x_df']),
+            "yaxis": get_axis(config['y_df']),
             "height": "600px",
         },
     }

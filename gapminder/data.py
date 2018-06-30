@@ -3,6 +3,7 @@ import pandas as pd
 
 
 TOTAL_POPULATION_FILE = "indicator gapminder population.xlsx"
+TOTAL_POPULATION = "Total population"
 
 
 def load_df(file_name):
@@ -24,10 +25,41 @@ def load_data():
 
     for file_name in os.listdir("data"):
         df = load_df(file_name)
-
-        # We analyze only countries with population
-        df = df.loc[df.index.isin(population_df.index)]
-
         data[df.index.name] = df
 
     return data
+
+
+def prepare_data(
+    data, x_axis, y_axis, countries=None, bubble_size=TOTAL_POPULATION,
+):
+    x_df = data[x_axis].copy()
+    y_df = data[y_axis].copy()
+    z_df = data[bubble_size].copy()
+
+    datasets_countries = (
+        x_df.index.intersection(y_df.index)
+        .intersection(z_df.index)
+    )
+    if countries:
+        datasets_countries = datasets_countries.intersection(countries)
+
+    years = (
+        x_df.columns.intersection(y_df.columns)
+        .intersection(z_df.columns)
+    )
+    not_null = (
+        (x_df.loc[datasets_countries, years].notnull()) &
+        (y_df.loc[datasets_countries, years].notnull()) &
+        (z_df.loc[datasets_countries, years].notnull())
+    )
+    datasets_countries = datasets_countries[not_null.any(axis='columns')]
+    years = years[not_null.any(axis='rows')]
+
+    return {
+        'countries': datasets_countries.tolist(),
+        'years': years.tolist(),
+        'x_df': x_df.loc[datasets_countries, years],
+        'y_df': y_df.loc[datasets_countries, years],
+        'z_df': z_df.loc[datasets_countries, years],
+    }
