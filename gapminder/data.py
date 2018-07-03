@@ -30,12 +30,12 @@ def load_data():
     return data
 
 
-def prepare_data(
-    data, x_axis, y_axis, countries=None, bubble_size=TOTAL_POPULATION,
+def get_config(
+    data, x_axis, y_axis, z_axis=TOTAL_POPULATION, countries=None,
 ):
     x_df = data[x_axis].copy()
     y_df = data[y_axis].copy()
-    z_df = data[bubble_size].copy()
+    z_df = data[z_axis].copy()
 
     datasets_countries = (
         x_df.index.intersection(y_df.index)
@@ -53,6 +53,7 @@ def prepare_data(
         (y_df.loc[datasets_countries, years].notnull()) &
         (z_df.loc[datasets_countries, years].notnull())
     )
+
     datasets_countries = datasets_countries[not_null.any(axis='columns')]
     years = years[not_null.any(axis='rows')]
 

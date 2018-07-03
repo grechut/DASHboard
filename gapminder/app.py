@@ -1,14 +1,9 @@
 """
 - bubble size mathematically correct
-
 - set properly height/width
-
-- better state management
-    - how to properly keep state?
-    - how to propagate state so that we do not have callback hell?
+- display title
 
 - play/pause interval
-
 - add 2nd chart, e.g. with distributions
 
 
@@ -20,8 +15,10 @@ Optional:
 
 - map of the world => legend for color continents
 
-Other quesitons:
-- how to deal with dynamic data and selections?
+Other questions:
+- better state management
+    - how to properly keep state?
+    - how to propagate state so that we do not have callback hell?
 - what is order of callbacks doing?
 """
 
@@ -35,7 +32,7 @@ import numpy as np
 
 from data import (
     load_data,
-    prepare_data,
+    get_config,
 )
 from app_utils import MarkerSize, options, get_axis
 
@@ -50,7 +47,7 @@ DATA_CHOICES = list(data.keys())
 DEFAULT_X_AXIS = DATA_CHOICES[1]
 DEFAULT_Y_AXIS = DATA_CHOICES[2]
 
-config = prepare_data(
+config = get_config(
     data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS,
 )
 
@@ -84,7 +81,6 @@ app.layout = html.Div(
                     className="row",
                     children=[
                         html.Div(
-                            className="col l12",
                             children=[dcc.Slider(id="year_slider")],
                             id="year_slider_container",
                         ),
@@ -121,7 +117,10 @@ app.layout = html.Div(
             ],
             style={"margin": "0 20px"},
         ),
-        html.Div(className="row", children=[dcc.Graph(id="main_chart")]),
+        html.Div(
+            className="row",
+            children=[dcc.Graph(id="main_chart", animate=True)]
+        ),
         html.Div(
             className="row",
             children=[
@@ -152,8 +151,9 @@ def update_year_slider(x_axis_selection, y_axis_selection, countries_selection):
     if not x_axis_selection or not y_axis_selection:
         return []
 
-    config = prepare_data(
-        data, x_axis_selection, y_axis_selection, countries_selection,
+    config = get_config(
+        data, x_axis_selection, y_axis_selection,
+        countries=countries_selection,
     )
     years = config['years']
 
@@ -187,30 +187,31 @@ def update_year_slider(x_axis_selection, y_axis_selection, countries_selection):
     ],
 )
 def update_chart(
-    x_axis_selection, y_axis_selection, year_container, year,
+    x_axis_selection, y_axis_selection, year_container, year_idx,
     countries_selection,
 ):
-    if not x_axis_selection or not y_axis_selection or not year:
+    if not x_axis_selection or not y_axis_selection or not year_idx:
         return
 
-    config = prepare_data(
-        data, x_axis_selection, y_axis_selection, countries_selection,
+    config = get_config(
+        data, x_axis_selection, y_axis_selection,
+        countries=countries_selection,
     )
-    selected_year = config['years'][year]
+    year = config['years'][year_idx]
 
-    marker_size = MarkerSize(config['z_df'][selected_year])
+    marker_size = MarkerSize(config['z_df'][year])
     return {
         "data": [
             go.Scatter(
-                x=[config['x_df'].loc[country, selected_year]],
-                y=[config['y_df'].loc[country, selected_year]],
+                x=[config['x_df'].loc[country, year]],
+                y=[config['y_df'].loc[country, year]],
                 mode="markers+text" if countries_selection else "markers",
                 textposition="top center" if countries_selection else None,
-                text=[country],
+                text=["{} ({})".format(country, year)],
                 # Is it okay to just log or do we need to scale?
                 marker={
                     "size": marker_size.size(
-                        config['z_df'].loc[country, selected_year]
+                        config['z_df'].loc[country, year]
                     )
                 },
                 name="",  # hide trace-39 etc
@@ -218,7 +219,6 @@ def update_chart(
             for country in config['countries']
         ],
         "layout": {
-            "title": selected_year,
             "showlegend": False,
             "xaxis": get_axis(config['x_df']),
             "yaxis": get_axis(config['y_df']),
