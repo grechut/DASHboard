@@ -2,6 +2,10 @@
 - bubble size mathematically correct
 - set properly height/width
 - display title
+- add caching
+    - improve calculating years 3-4 times instead of only once (maybe extra div with data or caching)
+- debug animate + log
+- download more data
 
 - play/pause interval
 - add 2nd chart, e.g. with distributions
@@ -30,10 +34,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 
-from data import (
-    load_data,
-    get_config,
-)
+from data import load_data, get_config
 from app_utils import MarkerSize, options, get_axis
 
 
@@ -47,9 +48,7 @@ DATA_CHOICES = list(data.keys())
 DEFAULT_X_AXIS = DATA_CHOICES[1]
 DEFAULT_Y_AXIS = DATA_CHOICES[2]
 
-config = get_config(
-    data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS,
-)
+config = get_config(data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS)
 
 
 # Creating app
@@ -83,8 +82,8 @@ app.layout = html.Div(
                         html.Div(
                             children=[dcc.Slider(id="year_slider")],
                             id="year_slider_container",
-                        ),
-                    ]
+                        )
+                    ],
                 ),
                 html.Div(
                     className="row",
@@ -106,7 +105,7 @@ app.layout = html.Div(
                                 html.Label("Countries"),
                                 dcc.Dropdown(
                                     id="countries_selection",
-                                    options=options(config['countries']),
+                                    options=options(config["countries"]),
                                     value=[],
                                     multi=True,
                                 ),
@@ -119,7 +118,15 @@ app.layout = html.Div(
         ),
         html.Div(
             className="row",
-            children=[dcc.Graph(id="main_chart", animate=True)]
+            children=[
+                html.Div(
+                    className="col l9 m9 s9",
+                    children=[dcc.Graph(id="main_chart", animate=True)],
+                ),
+                html.Div(
+                    className="col l3 m3 s3", children=[html.Div(id="histograms")]
+                ),
+            ],
         ),
         html.Div(
             className="row",
@@ -152,22 +159,21 @@ def update_year_slider(x_axis_selection, y_axis_selection, countries_selection):
         return []
 
     config = get_config(
-        data, x_axis_selection, y_axis_selection,
-        countries=countries_selection,
+        data, x_axis_selection, y_axis_selection, countries=countries_selection
     )
-    years = config['years']
+    years = config["years"]
 
     marks = {i: year for i, year in enumerate(years)}
     if len(years) > 30:
-        marks = {i: year if i % 5 == 0 else '' for i, year in enumerate(years)}
+        marks = {i: year if i % 5 == 0 else "" for i, year in enumerate(years)}
 
     return [
         html.Label("Year"),
         dcc.Slider(
             id="year_slider",
             min=0,
-            max=len(years)-1,
-            value=len(years)-1,
+            max=len(years) - 1,
+            value=len(years) - 1,
             marks=marks,
             updatemode="drag",
             dots=False,
@@ -187,44 +193,100 @@ def update_year_slider(x_axis_selection, y_axis_selection, countries_selection):
     ],
 )
 def update_chart(
-    x_axis_selection, y_axis_selection, year_container, year_idx,
-    countries_selection,
+    x_axis_selection, y_axis_selection, year_container, year_idx, countries_selection
 ):
     if not x_axis_selection or not y_axis_selection or not year_idx:
         return
 
     config = get_config(
-        data, x_axis_selection, y_axis_selection,
-        countries=countries_selection,
+        data, x_axis_selection, y_axis_selection, countries=countries_selection
     )
-    year = config['years'][year_idx]
+    year = config["years"][year_idx]
 
-    marker_size = MarkerSize(config['z_df'][year])
+    marker_size = MarkerSize(config["z_df"][year])
     return {
         "data": [
             go.Scatter(
-                x=[config['x_df'].loc[country, year]],
-                y=[config['y_df'].loc[country, year]],
+                x=[config["x_df"].loc[country, year]],
+                y=[config["y_df"].loc[country, year]],
                 mode="markers+text" if countries_selection else "markers",
                 textposition="top center" if countries_selection else None,
                 text=["{} ({})".format(country, year)],
                 # Is it okay to just log or do we need to scale?
-                marker={
-                    "size": marker_size.size(
-                        config['z_df'].loc[country, year]
-                    )
-                },
+                marker={"size": marker_size.size(config["z_df"].loc[country, year])},
                 name="",  # hide trace-39 etc
             )
-            for country in config['countries']
+            for country in config["countries"]
         ],
         "layout": {
             "showlegend": False,
-            "xaxis": get_axis(config['x_df']),
-            "yaxis": get_axis(config['y_df']),
-            "height": "600px",
+            "xaxis": get_axis(config["x_df"]),
+            "yaxis": get_axis(config["y_df"]),
+            "height": 600,
+            "margin": {"b": 30},
         },
     }
+
+
+@app.callback(
+    Output("histograms", "children"),
+    [
+        Input(component_id="x_axis_selection", component_property="value"),
+        Input(component_id="y_axis_selection", component_property="value"),
+        # Workaround for proper detection of callback dependencies
+        Input(component_id="year_slider_container", component_property="children"),
+        Input(component_id="year_slider", component_property="value"),
+        Input(component_id="countries_selection", component_property="value"),
+    ],
+)
+def update_hist_chart(
+    x_axis_selection, y_axis_selection, year_container, year_idx, countries_selection
+):
+    if not x_axis_selection or not y_axis_selection or not year_idx:
+        return
+
+    config = get_config(
+        data, x_axis_selection, y_axis_selection, countries=countries_selection
+    )
+    year = config["years"][year_idx]
+
+    return [
+        html.Div(
+            className="row",
+            children=[
+                html.Div(
+                    dcc.Graph(
+                        id="y_hist",
+                        figure={
+                            "data": [
+                                go.Histogram(x=data[y_axis_selection][year], nbinsx=10)
+                            ],
+                            "layout": {
+                                "title": y_axis_selection,
+                                "height": 300,
+                                "margin": {"l": 30, "b": 30, "t": 30, "r": 20},
+                            },
+                        },
+                    )
+                ),
+                html.Div(
+                    dcc.Graph(
+                        id="x_hist",
+                        figure={
+                            "data": [
+                                go.Histogram(x=data[x_axis_selection][year], nbinsx=10)
+                            ],
+                            "layout": {
+                                "title": x_axis_selection,
+                                "height": 300,
+                                "margin": {"l": 30, "b": 30, "t": 50, "r": 20},
+                            },
+                        },
+                    )
+                ),
+            ],
+        )
+    ]
 
 
 if __name__ == "__main__":
