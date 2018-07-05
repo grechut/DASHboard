@@ -1,14 +1,12 @@
 """
 - bubble size mathematically correct
-- set properly height/width
-- display title
+- display title in the background
 - add caching
     - improve calculating years 3-4 times instead of only once (maybe extra div with data or caching)
 - debug animate + log
 - download more data
 
 - play/pause interval
-- add 2nd chart, e.g. with distributions
 
 
 Optional:
@@ -222,8 +220,8 @@ def update_chart(
             "showlegend": False,
             "xaxis": get_axis(config["x_df"]),
             "yaxis": get_axis(config["y_df"]),
-            "height": 600,
-            "margin": {"b": 30},
+            "height": 550,
+            "margin": {"b": 20, "r": 0, "t": 10},
         },
     }
 
@@ -259,12 +257,17 @@ def update_hist_chart(
                         id="y_hist",
                         figure={
                             "data": [
-                                go.Histogram(x=data[y_axis_selection][year], nbinsx=10)
+                                go.Histogram(
+                                    x=data[y_axis_selection][year],
+                                    nbinsx=10,
+                                    opacity=0.5,
+                                )
                             ],
                             "layout": {
                                 "title": y_axis_selection,
-                                "height": 300,
-                                "margin": {"l": 30, "b": 30, "t": 30, "r": 20},
+                                "height": 275,
+                                "margin": {"l": 30, "b": 30, "t": 30, "r": 30},
+                                "yaxis": {"showticklabels": False},
                             },
                         },
                     )
@@ -274,12 +277,17 @@ def update_hist_chart(
                         id="x_hist",
                         figure={
                             "data": [
-                                go.Histogram(x=data[x_axis_selection][year], nbinsx=10)
+                                go.Histogram(
+                                    x=data[x_axis_selection][year],
+                                    nbinsx=10,
+                                    opacity=0.5,
+                                )
                             ],
                             "layout": {
                                 "title": x_axis_selection,
-                                "height": 300,
-                                "margin": {"l": 30, "b": 30, "t": 50, "r": 20},
+                                "height": 275,
+                                "margin": {"l": 30, "b": 30, "t": 50, "r": 30},
+                                "yaxis": {"showticklabels": False},
                             },
                         },
                     )
