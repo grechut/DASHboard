@@ -78,15 +78,6 @@ app.layout = html.Div(
                     className="row",
                     children=[
                         html.Div(
-                            children=[dcc.Slider(id="year_slider")],
-                            id="year_slider_container",
-                        )
-                    ],
-                ),
-                html.Div(
-                    className="row",
-                    children=[
-                        html.Div(
                             className="col s12 m6 l6",
                             children=[
                                 html.Label("Y Axis"),
@@ -136,7 +127,16 @@ app.layout = html.Div(
                     value=DEFAULT_X_AXIS,
                 ),
             ],
-            style={"width": "300px"},
+            style={"width": "300px", "margin-top": -20},
+        ),
+        html.Div(
+            className="row",
+            children=[
+                html.Div(
+                    id="year_slider_container", children=[dcc.Slider(id="year_slider")]
+                )
+            ],
+            style={"margin": "0 40px"},
         ),
     ]
 )
@@ -202,6 +202,9 @@ def update_chart(
     year = config["years"][year_idx]
 
     marker_size = MarkerSize(config["z_df"][year])
+
+    print(get_axis(config["x_df"]))
+
     return {
         "data": [
             go.Scatter(
@@ -220,8 +223,8 @@ def update_chart(
             "showlegend": False,
             "xaxis": get_axis(config["x_df"]),
             "yaxis": get_axis(config["y_df"]),
-            "height": 550,
-            "margin": {"b": 20, "r": 0, "t": 10},
+            "height": 500,
+            "margin": {"b": 30, "r": 0, "t": 30},
         },
     }
 
@@ -265,7 +268,8 @@ def update_hist_chart(
                             ],
                             "layout": {
                                 "title": y_axis_selection,
-                                "height": 275,
+                                "titlefont": {"size": 12},
+                                "height": 250,
                                 "margin": {"l": 30, "b": 30, "t": 30, "r": 30},
                                 "yaxis": {"showticklabels": False},
                             },
@@ -285,7 +289,8 @@ def update_hist_chart(
                             ],
                             "layout": {
                                 "title": x_axis_selection,
-                                "height": 275,
+                                "titlefont": {"size": 12},
+                                "height": 250,
                                 "margin": {"l": 30, "b": 30, "t": 50, "r": 30},
                                 "yaxis": {"showticklabels": False},
                             },

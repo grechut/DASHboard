@@ -22,7 +22,7 @@ def get_axis(values):
     min_value = values.min().min()
     max_value = values.max().max()
 
-    axis_type = "log" if max_value > 1e5 else "linear"
+    axis_type = "log" if max_value > 1e5 and min_value > 0 else "linear"
 
     if axis_type == "log":
         min_value = np.log10(min_value)
@@ -30,7 +30,8 @@ def get_axis(values):
 
     range_width = max_value - min_value
 
-    return {
-        "range": [min_value - range_width * 0.1, max_value + range_width * 0.1],
-        "type": axis_type,
-    }
+    if axis_type == "linear":
+        # Log cannot be < 0
+        min_value = min_value - range_width * 0.1
+
+    return {"range": [min_value, max_value + range_width * 0.1], "type": axis_type}
