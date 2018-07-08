@@ -193,7 +193,7 @@ def update_year_slider(x_axis_selection, y_axis_selection, countries_selection):
 def update_chart(
     x_axis_selection, y_axis_selection, year_container, year_idx, countries_selection
 ):
-    if not x_axis_selection or not y_axis_selection or not year_idx:
+    if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
     config = get_config(
@@ -240,7 +240,7 @@ def update_chart(
 def update_hist_chart(
     x_axis_selection, y_axis_selection, year_container, year_idx, countries_selection
 ):
-    if not x_axis_selection or not y_axis_selection or not year_idx:
+    if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
     config = get_config(
