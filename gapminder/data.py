@@ -2,7 +2,6 @@ import os
 import pandas as pd
 
 
-TOTAL_POPULATION_FILE = "indicator gapminder population.xlsx"
 TOTAL_POPULATION = "Total population"
 
 
@@ -20,8 +19,6 @@ def load_df(file_name):
 
 def load_data():
     data = {}
-
-    population_df = load_df(TOTAL_POPULATION_FILE)
 
     for file_name in os.listdir("data"):
         df = load_df(file_name)
