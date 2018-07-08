@@ -1,12 +1,12 @@
 """
-- bubble size mathematically correct
-- display title in the background
+- display title in the background => tried H1 and title but no success
 - add caching
     - improve calculating years 3-4 times instead of only once (maybe extra div with data or caching)
-- debug animate + log
 - download more data
 
 - play/pause interval
+
+- make color bubble somehow meaninful
 
 
 Optional:
@@ -33,7 +33,7 @@ import pandas as pd
 import numpy as np
 
 from data import load_data, get_config
-from app_utils import MarkerSize, options, get_axis
+from app_utils import CircleMarkerSizer, options, get_axis
 
 
 TITLE = "Poor man's Gapminder"
@@ -201,9 +201,7 @@ def update_chart(
     )
     year = config["years"][year_idx]
 
-    marker_size = MarkerSize(config["z_df"][year])
-
-    print(get_axis(config["x_df"]))
+    marker_sizer = CircleMarkerSizer(config["z_df"][year])
 
     return {
         "data": [
@@ -214,7 +212,7 @@ def update_chart(
                 textposition="top center" if countries_selection else None,
                 text=["{} ({})".format(country, year)],
                 # Is it okay to just log or do we need to scale?
-                marker={"size": marker_size.size(config["z_df"].loc[country, year])},
+                marker={"size": marker_sizer.size(config["z_df"].loc[country, year])},
                 name="",  # hide trace-39 etc
             )
             for country in config["countries"]

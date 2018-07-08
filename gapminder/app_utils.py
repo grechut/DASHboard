@@ -1,16 +1,23 @@
 import numpy as np
 
-# Very much POC, rethink.
-# Prolly we need log as it will display more fair
-class MarkerSize:
-    def __init__(self, values, max_size=40, min_size=10):
-        self.min_val = values.min()
-        self.max_val = values.max()
+
+class CircleMarkerSizer:
+    def __init__(self, values, max_size=50, min_size=10):
+        self.min_val = self.transform(values.min())
+        self.max_val = self.transform(values.max())
+
         self.max_size = max_size
         self.min_size = min_size
 
+    def transform(self, x):
+        # Sqrt so that circle area is representative for value.
+        # E.g. If we had two values 1 and 10, and we didn't transform,
+        #   then circle areas would be 6.28 (for 1) and 628 (for 10).
+        #   628 / 6.28 == 100, so the ratio between values is false.
+        return np.sqrt(abs(x))
+
     def size(self, value):
-        scaled = (value - self.min_val) / self.max_val
+        scaled = (self.transform(value) - self.min_val) / self.max_val
         return self.min_size + scaled * (self.max_size - self.min_size)
 
 
