@@ -30,37 +30,29 @@ def load_data():
     return data
 
 
-def get_config(
-    data, x_axis, y_axis, z_axis=TOTAL_POPULATION, countries=None,
-):
+def get_config(data, x_axis, y_axis, z_axis=TOTAL_POPULATION, countries=None):
     x_df = data[x_axis].copy()
     y_df = data[y_axis].copy()
     z_df = data[z_axis].copy()
 
-    datasets_countries = (
-        x_df.index.intersection(y_df.index)
-        .intersection(z_df.index)
-    )
+    datasets_countries = x_df.index.intersection(y_df.index).intersection(z_df.index)
     if countries:
         datasets_countries = datasets_countries.intersection(countries)
 
-    years = (
-        x_df.columns.intersection(y_df.columns)
-        .intersection(z_df.columns)
-    )
+    years = x_df.columns.intersection(y_df.columns).intersection(z_df.columns)
     not_null = (
-        (x_df.loc[datasets_countries, years].notnull()) &
-        (y_df.loc[datasets_countries, years].notnull()) &
-        (z_df.loc[datasets_countries, years].notnull())
+        (x_df.loc[datasets_countries, years].notnull())
+        & (y_df.loc[datasets_countries, years].notnull())
+        & (z_df.loc[datasets_countries, years].notnull())
     )
 
-    datasets_countries = datasets_countries[not_null.any(axis='columns')]
-    years = years[not_null.any(axis='rows')]
+    datasets_countries = datasets_countries[not_null.any(axis="columns")]
+    years = years[not_null.any(axis="rows")]
 
     return {
-        'countries': datasets_countries.tolist(),
-        'years': years.tolist(),
-        'x_df': x_df.loc[datasets_countries, years],
-        'y_df': y_df.loc[datasets_countries, years],
-        'z_df': z_df.loc[datasets_countries, years],
+        "countries": datasets_countries.tolist(),
+        "years": years.tolist(),
+        "x_df": x_df.loc[datasets_countries, years],
+        "y_df": y_df.loc[datasets_countries, years],
+        "z_df": z_df.loc[datasets_countries, years],
     }
