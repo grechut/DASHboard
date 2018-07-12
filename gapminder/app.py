@@ -1,6 +1,7 @@
 """
 - interval still playing after reaching max
 - btn clicks (clicks_counter) => is this madness?
+- style play/pause button
 
 Can be done individually:
 - blur instead of removing on country selection
