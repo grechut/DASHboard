@@ -7,6 +7,7 @@
 - play/pause interval
 
 - make color bubble somehow meaninful
+- blur instead of removing on country selection
 
 
 Optional:
