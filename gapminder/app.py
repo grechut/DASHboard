@@ -1,28 +1,18 @@
 """
-- display title in the background => tried H1 and title but no success
-- add caching
-    - improve calculating years 3-4 times instead of only once (maybe extra div with data or caching)
-- download more data
-
+Final Boss:
 - play/pause interval
-
-- make color bubble somehow meaninful
-- blur instead of removing on country selection
-
-
-Optional:
-- color hue
-- color of bubble => color of continent
-- more than population for bubble size
 - present dots from previously selected year
 
-- map of the world => legend for color continents
+Can be done individually:
+- blur instead of removing on country selection
+- make color bubble express continent (https://www.gapminder.org/fw/four-regions/)
+- add caching
+- download more data (maybe somewhere data is batched, then post link. Otherise download 20-30 most intersting)
 
 Other questions:
-- better state management
-    - how to properly keep state?
-    - how to propagate state so that we do not have callback hell?
+- how to display title in the background => tried H1 and title but no success
 - what is order of callbacks doing?
+- how to nicely code a case where you have 10 sliders, each depending on each other and external data (comin in random order)?
 """
 
 import dash
