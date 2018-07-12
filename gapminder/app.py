@@ -1,7 +1,6 @@
 """
-Final Boss:
-- play/pause interval
-- present dots from previously selected year
+- interval still playing after reaching max
+- btn clicks (clicks_counter) => is this madness?
 
 Can be done individually:
 - blur instead of removing on country selection
@@ -10,13 +9,17 @@ Can be done individually:
 - download more data (maybe somewhere data is batched, then post link. Otherise download 20-30 most intersting)
 
 Other questions:
+- animate displaying crappy fake dots
 - how to display title in the background => tried H1 and title but no success
 - what is order of callbacks doing?
 - how to nicely code a case where you have 10 sliders, each depending on each other and external data (comin in random order)?
+- any better way to handle clicks?
 """
 
+from collections import defaultdict
+
 import dash
-from dash.dependencies import Output, Event, Input
+from dash.dependencies import Output, Event, Input, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
@@ -43,6 +46,9 @@ config = get_config(data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS)
 # Creating app
 app = dash.Dash(__name__)
 app.title = TITLE
+
+# Journey begins
+app.config["suppress_callback_exceptions"] = True
 
 
 # Materialize, not sure what to use
@@ -111,14 +117,26 @@ app.layout = html.Div(
         html.Div(
             className="row",
             children=[
-                html.Label("X Axis"),
-                dcc.Dropdown(
-                    id="x_axis_selection",
-                    options=options(DATA_CHOICES),
-                    value=DEFAULT_X_AXIS,
+                html.Div(
+                    className="col l3 m3 s3",
+                    children=[
+                        html.Button("Play", id="play_button", className="btn-large"),
+                        html.Button("Pause", id="pause_button", className="btn-large"),
+                    ],
+                ),
+                html.Div(
+                    className="col l3 m3 s3",
+                    children=[
+                        html.Label("X Axis"),
+                        dcc.Dropdown(
+                            id="x_axis_selection",
+                            options=options(DATA_CHOICES),
+                            value=DEFAULT_X_AXIS,
+                        ),
+                    ],
                 ),
             ],
-            style={"width": "300px", "margin-top": -20},
+            style={"margin": "-20px 0 0 40px"},
         ),
         html.Div(
             className="row",
@@ -129,6 +147,7 @@ app.layout = html.Div(
             ],
             style={"margin": "0 40px"},
         ),
+        html.Div(id="interval_container"),
     ]
 )
 
@@ -162,7 +181,7 @@ def update_year_slider(x_axis_selection, y_axis_selection, countries_selection):
             id="year_slider",
             min=0,
             max=len(years) - 1,
-            value=len(years) - 1,
+            value=0,
             marks=marks,
             updatemode="drag",
             dots=False,
@@ -289,6 +308,33 @@ def update_hist_chart(
             ],
         )
     ]
+
+
+@app.callback(
+    Output("year_slider", "value"),
+    [Input("play_interval", "n_intervals")],
+    [State("year_slider", "value"), State("year_slider", "max")],
+)
+def increase_year(n_intervals, year_value, year_max):
+    return min(year_value + 1, year_max)
+
+
+clicks_counter = defaultdict(int)
+
+
+@app.callback(
+    Output("interval_container", "children"),
+    [Input("play_button", "n_clicks"), Input("pause_button", "n_clicks")],
+    [State("year_slider", "value"), State("year_slider", "max")],
+)
+def play_pause(play_clicks, pause_clicks, year_value, year_max):
+    if (
+        (play_clicks is not None and play_clicks - clicks_counter["play"])
+    ) and year_value < year_max:
+        clicks_counter["play"] = play_clicks
+        return [dcc.Interval(id="play_interval", interval=1 * 1000)]
+    else:
+        return []
 
 
 if __name__ == "__main__":

@@ -39,6 +39,6 @@ def get_axis(values):
 
     if axis_type == "linear":
         # Log cannot be < 0
-        min_value = min_value - range_width * 0.1
+        min_value = min_value - range_width * 0.05
 
     return {"range": [min_value, max_value + range_width * 0.1], "type": axis_type}
