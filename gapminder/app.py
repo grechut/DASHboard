@@ -1,6 +1,5 @@
 """
 - interval still playing after reaching max
-- btn clicks (clicks_counter) => is this madness?
 - style play/pause button
 
 Can be done individually:
@@ -18,6 +17,8 @@ Other questions:
 """
 
 from collections import defaultdict
+
+import json
 
 import dash
 from dash.dependencies import Output, Event, Input, State
@@ -148,7 +149,11 @@ app.layout = html.Div(
             ],
             style={"margin": "0 40px"},
         ),
-        html.Div(id="interval_container"),
+        html.Div(
+            id="interval_container",
+            children=[dcc.Interval(id="play_interval", interval=1 * 1000)],
+        ),
+        html.Div(id="play_state", style={"display": "none"}),
     ]
 )
 
@@ -312,30 +317,54 @@ def update_hist_chart(
 
 
 @app.callback(
-    Output("year_slider", "value"),
-    [Input("play_interval", "n_intervals")],
-    [State("year_slider", "value"), State("year_slider", "max")],
+    Output("play_state", "children"),
+    [
+        Input("play_button", "n_clicks"),
+        Input("pause_button", "n_clicks"),
+        Input("year_slider", "value"),
+    ],
+    [State("play_state", "children"), State("year_slider", "max")],
 )
-def increase_year(n_intervals, year_value, year_max):
-    return min(year_value + 1, year_max)
+def player_state(play_clicks, pause_clicks, year_value, current_state, year_max):
+    if current_state:
+        state_dict = json.loads(current_state)
+    else:
+        state_dict = {"state": None, "pause": 0, "play": 0}
 
+    if play_clicks is not None and play_clicks - state_dict["play"]:
+        state_dict["play"] = play_clicks
+        state_dict["state"] = True
+    elif pause_clicks is not None and pause_clicks - state_dict["pause"]:
+        state_dict["pause"] = pause_clicks
+        state_dict["state"] = False
+    else:
+        if year_value == year_max:
+            state_dict["state"] = False
+        else:
+            return current_state
 
-clicks_counter = defaultdict(int)
+    return json.dumps(state_dict)
 
 
 @app.callback(
-    Output("interval_container", "children"),
-    [Input("play_button", "n_clicks"), Input("pause_button", "n_clicks")],
-    [State("year_slider", "value"), State("year_slider", "max")],
+    Output("year_slider", "value"),
+    [Input("play_interval", "n_intervals")],
+    [
+        State("play_state", "children"),
+        State("year_slider", "value"),
+        State("year_slider", "max"),
+        State("year_slider", "min"),
+    ],
 )
-def play_pause(play_clicks, pause_clicks, year_value, year_max):
-    if (
-        (play_clicks is not None and play_clicks - clicks_counter["play"])
-    ) and year_value < year_max:
-        clicks_counter["play"] = play_clicks
-        return [dcc.Interval(id="play_interval", interval=1 * 1000)]
-    else:
-        return []
+def increase_year(n_intervals, play_state, year_value, year_max, year_min):
+    if play_state:
+        play_state = json.loads(play_state)["state"]
+
+    if year_value == year_max and play_state:
+        return year_min
+    if play_state:
+        return min(year_value + 1, year_max)
+    return year_value
 
 
 if __name__ == "__main__":
