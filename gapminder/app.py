@@ -225,7 +225,6 @@ def update_chart(
                 mode="markers+text" if countries_selection else "markers",
                 textposition="top center" if countries_selection else None,
                 text=["{} ({})".format(country, year)],
-                # Is it okay to just log or do we need to scale?
                 marker={"size": marker_sizer.size(config["z_df"].loc[country, year])},
                 name="",  # hide trace-39 etc
             )
