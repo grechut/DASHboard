@@ -1,6 +1,4 @@
 """
-- style play/pause button
-
 Can be done individually:
 - blur instead of removing on country selection
 - make color bubble express continent (https://www.gapminder.org/fw/four-regions/)
@@ -119,14 +117,19 @@ app.layout = html.Div(
             className="row",
             children=[
                 html.Div(
-                    className="col l3 m3 s3",
+                    className="col l3 m6 s6",
                     children=[
-                        html.Button("Play", id="play_button", className="btn-large"),
-                        html.Button("Pause", id="pause_button", className="btn-large"),
+                        html.Button("Play", id="play_button", className="btn"),
+                        html.Button(
+                            "Pause",
+                            id="pause_button",
+                            className="btn red",
+                            style={"margin-left": "20px"},
+                        ),
                     ],
                 ),
                 html.Div(
-                    className="col l3 m3 s3",
+                    className="col l6 m6 s6",
                     children=[
                         html.Label("X Axis"),
                         dcc.Dropdown(
