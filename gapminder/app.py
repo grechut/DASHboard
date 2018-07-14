@@ -1,5 +1,4 @@
 """
-- interval still playing after reaching max
 - style play/pause button
 
 Can be done individually:
