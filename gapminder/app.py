@@ -149,10 +149,7 @@ app.layout = html.Div(
             ],
             style={"margin": "0 40px"},
         ),
-        html.Div(
-            id="interval_container",
-            children=[dcc.Interval(id="play_interval", interval=1 * 1000)],
-        ),
+        html.Div(id="interval_container"),
         html.Div(id="play_state", style={"display": "none"}),
     ]
 )
@@ -344,6 +341,17 @@ def player_state(play_clicks, pause_clicks, year_value, current_state, year_max)
             return current_state
 
     return json.dumps(state_dict)
+
+
+@app.callback(
+    Output("interval_container", "children"), [Input("play_state", "children")]
+)
+def create_interval(play_state):
+    if play_state:
+        play_state = json.loads(play_state)["state"]
+    if play_state:
+        return [dcc.Interval(id="play_interval", interval=1 * 1000)]
+    return []
 
 
 @app.callback(
