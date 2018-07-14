@@ -13,9 +13,8 @@ Other questions:
 - any better way to handle clicks?
 """
 
-from collections import defaultdict
-
 import json
+from collections import defaultdict
 
 import dash
 from dash.dependencies import Output, Event, Input, State
