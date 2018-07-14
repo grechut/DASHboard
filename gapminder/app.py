@@ -3,7 +3,6 @@ Can be done individually:
 - blur instead of removing on country selection
 - make color bubble express continent (https://www.gapminder.org/fw/four-regions/)
 - add caching
-- download more data (maybe somewhere data is batched, then post link. Otherise download 20-30 most intersting)
 
 Other questions:
 - animate displaying crappy fake dots
@@ -29,13 +28,12 @@ from app_utils import CircleMarkerSizer, options, get_axis
 
 
 TITLE = "Poor man's Gapminder"
-TOTAL_POPULATION = "Total population"
 
 # Loading data
 data = load_data()
-DATA_CHOICES = list(data.keys())
+DATA_CHOICES = sorted(list(data.keys()))
 
-DEFAULT_X_AXIS = DATA_CHOICES[1]
+DEFAULT_X_AXIS = DATA_CHOICES[3]
 DEFAULT_Y_AXIS = DATA_CHOICES[2]
 
 config = get_config(data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS)

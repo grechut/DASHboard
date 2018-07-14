@@ -21,6 +21,9 @@ def load_data():
     data = {}
 
     for file_name in os.listdir("data"):
+        if ".xlsx" not in file_name:
+            continue
+
         df = load_df(file_name)
         data[df.index.name] = df
 
