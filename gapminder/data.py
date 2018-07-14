@@ -1,4 +1,6 @@
 import os
+import functools
+
 import pandas as pd
 
 
@@ -27,6 +29,35 @@ def load_data():
     return data
 
 
+# Caching needs hashable stuff.
+def make_stuff_hashable(func):
+    class HDict(dict):
+        def __hash__(self):
+            # DFs are not hashable. Use Keys.
+            return hash(frozenset(self.keys()))
+
+    class HList(list):
+        def __hash__(self):
+            return hash(" ".join([str(x) for x in self]))
+
+    def _make_hashable(stuff):
+        if isinstance(stuff, dict):
+            return HDict(stuff)
+        elif isinstance(stuff, list):
+            return HList(stuff)
+        return stuff
+
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        args = tuple([_make_hashable(arg) for arg in args])
+        kwargs = {k: _make_hashable(v) for k, v in kwargs.items()}
+        return func(*args, **kwargs)
+
+    return wrapped
+
+
+@make_stuff_hashable
+@functools.lru_cache(maxsize=32)
 def get_config(data, x_axis, y_axis, z_axis=TOTAL_POPULATION, countries=None):
     x_df = data[x_axis].copy()
     y_df = data[y_axis].copy()

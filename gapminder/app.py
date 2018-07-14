@@ -2,7 +2,6 @@
 Can be done individually:
 - blur instead of removing on country selection
 - make color bubble express continent (https://www.gapminder.org/fw/four-regions/)
-- add caching
 - download more data (maybe somewhere data is batched, then post link. Otherise download 20-30 most intersting)
 
 Other questions:
