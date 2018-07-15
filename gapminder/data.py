@@ -30,14 +30,12 @@ def load_data():
     return data
 
 
-def get_config(data, x_axis, y_axis, z_axis=TOTAL_POPULATION, countries=None):
+def get_config(data, x_axis, y_axis, z_axis=TOTAL_POPULATION):
     x_df = data[x_axis].copy()
     y_df = data[y_axis].copy()
     z_df = data[z_axis].copy()
 
     dataset_countries = x_df.index.intersection(y_df.index).intersection(z_df.index)
-    if countries:
-        dataset_countries = dataset_countries.intersection(countries)
 
     years = x_df.columns.intersection(y_df.columns).intersection(z_df.columns)
     not_null = (

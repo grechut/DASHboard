@@ -1,6 +1,5 @@
 """
 Can be done individually:
-- blur instead of removing on country selection
 - make color bubble express continent (https://www.gapminder.org/fw/four-regions/)
 - add caching
 
@@ -36,7 +35,7 @@ DATA_CHOICES = sorted(list(data.keys()))
 DEFAULT_X_AXIS = DATA_CHOICES[3]
 DEFAULT_Y_AXIS = DATA_CHOICES[2]
 
-config = get_config(data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS)
+init_config = get_config(data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS)
 
 
 # Creating app
@@ -87,7 +86,7 @@ app.layout = html.Div(
                                 html.Label("Countries"),
                                 dcc.Dropdown(
                                     id="countries_selection",
-                                    options=options(config["countries"]),
+                                    options=options(init_config["countries"]),
                                     value=[],
                                     multi=True,
                                 ),
@@ -161,16 +160,13 @@ app.layout = html.Div(
     [
         Input(component_id="x_axis_selection", component_property="value"),
         Input(component_id="y_axis_selection", component_property="value"),
-        Input(component_id="countries_selection", component_property="value"),
     ],
 )
-def update_year_slider(x_axis_selection, y_axis_selection, countries_selection):
+def update_year_slider(x_axis_selection, y_axis_selection):
     if not x_axis_selection or not y_axis_selection:
         return []
 
-    config = get_config(
-        data, x_axis_selection, y_axis_selection, countries=countries_selection
-    )
+    config = get_config(data, x_axis_selection, y_axis_selection)
     years = config["years"]
 
     marks = {i: year for i, year in enumerate(years)}
@@ -208,9 +204,7 @@ def update_chart(
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
-    config = get_config(
-        data, x_axis_selection, y_axis_selection, countries=countries_selection
-    )
+    config = get_config(data, x_axis_selection, y_axis_selection)
     year = config["years"][year_idx]
 
     marker_sizer = CircleMarkerSizer(config["z_df"][year])
@@ -220,10 +214,15 @@ def update_chart(
             go.Scatter(
                 x=[config["x_df"].loc[country, year]],
                 y=[config["y_df"].loc[country, year]],
-                mode="markers+text" if countries_selection else "markers",
-                textposition="top center" if countries_selection else None,
+                mode="markers+text" if country in countries_selection else "markers",
+                textposition="top center",
                 text=["{} ({})".format(country, year)],
-                marker={"size": marker_sizer.size(config["z_df"].loc[country, year])},
+                marker={
+                    "size": marker_sizer.size(config["z_df"].loc[country, year]),
+                    "opacity": 1
+                    if not countries_selection or country in countries_selection
+                    else 0.2,
+                },
                 name="",  # hide trace-39 etc
             )
             for country in config["countries"]
@@ -246,18 +245,13 @@ def update_chart(
         # Workaround for proper detection of callback dependencies
         Input(component_id="year_slider_container", component_property="children"),
         Input(component_id="year_slider", component_property="value"),
-        Input(component_id="countries_selection", component_property="value"),
     ],
 )
-def update_hist_chart(
-    x_axis_selection, y_axis_selection, year_container, year_idx, countries_selection
-):
+def update_hist_chart(x_axis_selection, y_axis_selection, year_container, year_idx):
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
-    config = get_config(
-        data, x_axis_selection, y_axis_selection, countries=countries_selection
-    )
+    config = get_config(data, x_axis_selection, y_axis_selection)
     year = config["years"][year_idx]
 
     return [
