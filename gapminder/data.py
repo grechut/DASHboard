@@ -3,10 +3,17 @@ import pandas as pd
 
 
 TOTAL_POPULATION = "Total population"
+DATA_FMT = "data/{}"
+COLOR_MAPPING = {
+    "europe": "#ffff66",
+    "africa": "#66ffff",
+    "americas": "#66ff66",
+    "asia": "#ff6666",
+}
 
 
 def load_df(file_name):
-    df = pd.read_excel("data/{}".format(file_name))
+    df = pd.read_excel(DATA_FMT.format(file_name))
     df = df.set_index(df.columns[0])
 
     # Some files got strings, some ints, why?
@@ -30,12 +37,15 @@ def load_data():
     return data
 
 
-def get_config(data, x_axis, y_axis, z_axis=TOTAL_POPULATION):
+def get_config(data, x_axis, y_axis, z_axis=TOTAL_POPULATION, supported_countries=None):
     x_df = data[x_axis].copy()
     y_df = data[y_axis].copy()
     z_df = data[z_axis].copy()
 
-    dataset_countries = x_df.index.intersection(y_df.index).intersection(z_df.index)
+    if supported_countries is None:
+        supported_countries = get_countires_mapping().keys()
+
+    dataset_countries = x_df.index.intersection(y_df.index).intersection(z_df.index).intersection(supported_countries)
 
     years = x_df.columns.intersection(y_df.columns).intersection(z_df.columns)
     not_null = (
@@ -54,3 +64,8 @@ def get_config(data, x_axis, y_axis, z_axis=TOTAL_POPULATION):
         "y_df": y_df.loc[dataset_countries, years],
         "z_df": z_df.loc[dataset_countries, years],
     }
+
+
+def get_countires_mapping():
+    df = pd.read_csv(DATA_FMT.format("country_mapping.csv"))
+    return dict(zip(df["name"], df["Gapminder's 4 world regions"].map(COLOR_MAPPING)))
