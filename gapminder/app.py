@@ -1,6 +1,5 @@
 """
 Can be done individually:
-- make color bubble express continent (https://www.gapminder.org/fw/four-regions/)
 - add caching
 
 Other questions:
@@ -22,7 +21,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 
-from data import load_data, get_config
+from data import load_data, get_config, get_countires_mapping
 from app_utils import CircleMarkerSizer, options, get_axis
 
 
@@ -34,8 +33,12 @@ DATA_CHOICES = sorted(list(data.keys()))
 
 DEFAULT_X_AXIS = DATA_CHOICES[3]
 DEFAULT_Y_AXIS = DATA_CHOICES[2]
+COUNTIRES_MAPPING = get_countires_mapping()
+SUPPORTED_COUNTRIES = COUNTIRES_MAPPING.keys()
 
-init_config = get_config(data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS)
+init_config = get_config(
+    data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS, supported_countries=SUPPORTED_COUNTRIES
+)
 
 
 # Creating app
@@ -166,7 +169,12 @@ def update_year_slider(x_axis_selection, y_axis_selection):
     if not x_axis_selection or not y_axis_selection:
         return []
 
-    config = get_config(data, x_axis_selection, y_axis_selection)
+    config = get_config(
+        data,
+        x_axis_selection,
+        y_axis_selection,
+        supported_countries=SUPPORTED_COUNTRIES,
+    )
     years = config["years"]
 
     marks = {i: year for i, year in enumerate(years)}
@@ -204,7 +212,12 @@ def update_chart(
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
-    config = get_config(data, x_axis_selection, y_axis_selection)
+    config = get_config(
+        data,
+        x_axis_selection,
+        y_axis_selection,
+        supported_countries=SUPPORTED_COUNTRIES,
+    )
     year = config["years"][year_idx]
 
     marker_sizer = CircleMarkerSizer(config["z_df"][year])
@@ -222,6 +235,8 @@ def update_chart(
                     "opacity": 1
                     if not countries_selection or country in countries_selection
                     else 0.2,
+                    "color": COUNTIRES_MAPPING[country],
+                    "line": {"width": 2},
                 },
                 name="",  # hide trace-39 etc
             )
@@ -251,7 +266,12 @@ def update_hist_chart(x_axis_selection, y_axis_selection, year_container, year_i
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
-    config = get_config(data, x_axis_selection, y_axis_selection)
+    config = get_config(
+        data,
+        x_axis_selection,
+        y_axis_selection,
+        supported_countries=SUPPORTED_COUNTRIES,
+    )
     year = config["years"][year_idx]
 
     return [
