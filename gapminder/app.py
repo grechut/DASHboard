@@ -1,13 +1,6 @@
 """
 Can be done individually:
 - add caching
-
-Other questions:
-- animate displaying crappy fake dots
-- how to display title in the background => tried H1 and title but no success
-- what is order of callbacks doing?
-- how to nicely code a case where you have 10 sliders, each depending on each other and external data (comin in random order)?
-- any better way to handle clicks?
 """
 
 import json
