@@ -7,7 +7,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
-import numpy as np
 from flask_caching import Cache
 
 from data import load_data, get_config, get_countires_mapping
