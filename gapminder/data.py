@@ -1,4 +1,5 @@
 import os
+
 import pandas as pd
 
 
@@ -45,7 +46,11 @@ def get_config(data, x_axis, y_axis, z_axis=TOTAL_POPULATION, supported_countrie
     if supported_countries is None:
         supported_countries = get_countires_mapping().keys()
 
-    dataset_countries = x_df.index.intersection(y_df.index).intersection(z_df.index).intersection(supported_countries)
+    dataset_countries = (
+        x_df.index.intersection(y_df.index)
+        .intersection(z_df.index)
+        .intersection(supported_countries)
+    )
 
     years = x_df.columns.intersection(y_df.columns).intersection(z_df.columns)
     not_null = (

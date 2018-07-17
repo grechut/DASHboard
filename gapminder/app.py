@@ -1,8 +1,3 @@
-"""
-Can be done individually:
-- add caching
-"""
-
 import json
 from collections import defaultdict
 
@@ -13,6 +8,7 @@ import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
+from flask_caching import Cache
 
 from data import load_data, get_config, get_countires_mapping
 from app_utils import CircleMarkerSizer, options, get_axis
@@ -33,13 +29,20 @@ init_config = get_config(
     data, DEFAULT_X_AXIS, DEFAULT_Y_AXIS, supported_countries=SUPPORTED_COUNTRIES
 )
 
-
 # Creating app
 app = dash.Dash(__name__)
 app.title = TITLE
 
 # Journey begins
 app.config["suppress_callback_exceptions"] = True
+
+
+cache = Cache(app.server, config={"CACHE_TYPE": "simple"})
+
+
+@cache.memoize(60)
+def get_config_cached(*args, **kwargs):
+    return get_config(*args, **kwargs)
 
 
 # Materialize, not sure what to use
@@ -162,7 +165,7 @@ def update_year_slider(x_axis_selection, y_axis_selection):
     if not x_axis_selection or not y_axis_selection:
         return []
 
-    config = get_config(
+    config = get_config_cached(
         data,
         x_axis_selection,
         y_axis_selection,
@@ -205,7 +208,7 @@ def update_chart(
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
-    config = get_config(
+    config = get_config_cached(
         data,
         x_axis_selection,
         y_axis_selection,
@@ -259,7 +262,7 @@ def update_hist_chart(x_axis_selection, y_axis_selection, year_container, year_i
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
-    config = get_config(
+    config = get_config_cached(
         data,
         x_axis_selection,
         y_axis_selection,
