@@ -13,14 +13,13 @@ from data import load_data, get_config, get_countires_mapping
 from app_utils import CircleMarkerSizer, options, get_axis
 
 
-TITLE = "Poor man's Gapminder"
-
 # Loading data
 data = load_data()
-DATA_CHOICES = sorted(list(data.keys()))
 
-DEFAULT_X_AXIS = DATA_CHOICES[3]
-DEFAULT_Y_AXIS = DATA_CHOICES[2]
+# Options
+DATA_CHOICES = sorted(list(data.keys()))
+DEFAULT_X_AXIS = "Life expectancy"
+DEFAULT_Y_AXIS = "GDP per capita"
 COUNTIRES_MAPPING = get_countires_mapping()
 SUPPORTED_COUNTRIES = COUNTIRES_MAPPING.keys()
 
@@ -30,7 +29,7 @@ init_config = get_config(
 
 # Creating app
 app = dash.Dash(__name__)
-app.title = TITLE
+app.title = "Poor man's Gapminder"
 
 # Journey begins
 app.config["suppress_callback_exceptions"] = True
@@ -44,7 +43,7 @@ def get_config_cached(*args, **kwargs):
     return get_config(*args, **kwargs)
 
 
-# Materialize, not sure what to use
+# Add Materialize CSS for friendly styling
 external_css = [
     "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"
 ]
