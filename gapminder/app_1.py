@@ -27,17 +27,16 @@ app.title = "Poor man's Gapminder"
 
 
 # Add Materialize CSS for friendly styling
-external_css = [
-    "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"
-]
-for css in external_css:
-    app.css.append_css({"external_url": css})
-external_js = [
-    "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"
-]
-for js in external_js:
-    app.scripts.append_script({"external_url": js})
-
+app.css.append_css(
+    {
+        "external_url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"
+    }
+)
+app.scripts.append_script(
+    {
+        "external_url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"
+    }
+)
 
 # Layout
 app.layout = html.Div(

@@ -10,6 +10,7 @@ app = dash.Dash(__name__)
 app.title = "Hello title"
 
 # Components
+
 app.layout = html.Div(
     [
         # html.H1("Hello world"),
@@ -55,6 +56,43 @@ app.layout = html.Div(
         # ),
     ]
 )
+
+# Styling
+
+# app.css.append_css(
+#     {
+#         "external_url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"
+#     }
+# )
+# app.scripts.append_script(
+#     {
+#         "external_url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"
+#     }
+# )
+
+# app.layout = html.Div(
+#     [
+#         # html.Div(
+#         #     [html.H1("Styling hello")],
+#         #     style={"width": "200px", "background-color": "red", "margin-top": "100px"},
+#         # ),
+#         # html.Div(
+#         #     [
+#         #         dcc.Dropdown(
+#         #             options=options(["Poland", "Jamaica", "Chile"]),
+#         #             value="Poland",
+#         #             # className="col l4 m4 s4",
+#         #         ),
+#         #         dcc.Dropdown(
+#         #             options=options(["Poland", "Jamaica", "Chile"]),
+#         #             value="Poland",
+#         #             # className="col l8 m8 s8",
+#         #         ),
+#         #     ],
+#         #     # className="row",
+#         # ),
+#     ]
+# )
 
 
 if __name__ == "__main__":
