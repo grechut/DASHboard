@@ -139,7 +139,8 @@ app.layout = html.Div(
             className="row",
             children=[
                 html.Div(
-                    id="year_slider_container", children=[dcc.Slider(id="year_slider")]
+                    id="year_slider_container",
+                    children=[dcc.Slider(id="year_slider", value=0)],
                 )
             ],
             style={"margin": "0 40px"},
@@ -194,15 +195,11 @@ def update_year_slider(x_axis_selection, y_axis_selection):
     [
         Input(component_id="x_axis_selection", component_property="value"),
         Input(component_id="y_axis_selection", component_property="value"),
-        # Workaround for proper detection of callback dependencies
-        Input(component_id="year_slider_container", component_property="children"),
         Input(component_id="year_slider", component_property="value"),
         Input(component_id="countries_selection", component_property="value"),
     ],
 )
-def update_chart(
-    x_axis_selection, y_axis_selection, year_container, year_idx, countries_selection
-):
+def update_chart(x_axis_selection, y_axis_selection, year_idx, countries_selection):
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
@@ -251,12 +248,10 @@ def update_chart(
     [
         Input(component_id="x_axis_selection", component_property="value"),
         Input(component_id="y_axis_selection", component_property="value"),
-        # Workaround for proper detection of callback dependencies
-        Input(component_id="year_slider_container", component_property="children"),
         Input(component_id="year_slider", component_property="value"),
     ],
 )
-def update_hist_chart(x_axis_selection, y_axis_selection, year_container, year_idx):
+def update_hist_chart(x_axis_selection, y_axis_selection, year_idx):
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
