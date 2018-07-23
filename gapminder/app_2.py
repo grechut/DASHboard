@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 
 import dash
-from dash.dependencies import Output, Event, Input, State
+from dash.dependencies import Output, Input, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
@@ -90,7 +90,7 @@ app.layout = html.Div(
             children=[
                 html.Div(
                     className="col l9 m9 s9",
-                    children=[dcc.Graph(id="main_chart", animate=True)],
+                    children=[dcc.Graph(id="main_chart")],
                 ),
                 html.Div(
                     className="col l3 m3 s3", children=[html.Div(id="histograms")]
@@ -206,6 +206,60 @@ def update_chart():
             "margin": {"b": 30, "r": 0, "t": 30},
         },
     }
+
+
+@app.callback(
+    Output("histograms", "children"),
+    [
+        Input(component_id="x_axis_selection", component_property="value"),
+        Input(component_id="y_axis_selection", component_property="value"),
+        # Workaround for proper detection of callback dependencies
+        Input(component_id="year_slider_container", component_property="children"),
+        Input(component_id="year_slider", component_property="value"),
+    ],
+)
+def update_hist_chart(x_axis_selection, y_axis_selection, year_container, year_idx):
+    if not x_axis_selection or not y_axis_selection or year_idx is None:
+        return
+
+    config = get_config(
+        data,
+        x_axis_selection,
+        y_axis_selection,
+        supported_countries=SUPPORTED_COUNTRIES,
+    )
+    year = config["years"][year_idx]
+
+    return [
+        html.Div(
+            className="row",
+            children=[
+                html.Div(
+                    dcc.Graph(
+                        id="y_hist",
+                        figure={
+                            "data": [
+                                go.Histogram(
+                                    x=data[y_axis_selection][year],
+                                    nbinsx=10,
+                                    opacity=0.5,
+                                )
+                            ],
+                            "layout": {
+                                "title": y_axis_selection,
+                                "titlefont": {"size": 12},
+                                "height": 250,
+                                "margin": {"l": 30, "b": 30, "t": 30, "r": 30},
+                                "yaxis": {"showticklabels": False},
+                            },
+                        },
+                    )
+                ),
+                # TODO:
+                # Implement histogram for x-axis
+            ],
+        )
+    ]
 
 
 if __name__ == "__main__":
