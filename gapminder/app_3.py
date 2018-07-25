@@ -38,9 +38,9 @@ app.config["suppress_callback_exceptions"] = True
 cache = Cache(app.server, config={"CACHE_TYPE": "simple"})
 
 
-@cache.memoize(60)
-def get_config_cached(*args, **kwargs):
-    return get_config(*args, **kwargs)
+# TODO Implement proper cached get_config_cached
+#   This one below is NOT CACHED :)
+get_config_cached = get_config
 
 
 # Add Materialize CSS for friendly styling
@@ -227,10 +227,8 @@ def update_chart(x_axis_selection, y_axis_selection, year_idx, countries_selecti
                 text=["{} ({})".format(country, year)],
                 marker={
                     "size": marker_sizer.size(config["z_df"].loc[country, year]),
-                    "opacity": 1
-                    if not countries_selection or country in countries_selection
-                    else 0.2,
-                    "color": COUNTIRES_MAPPING[country],
+                    # TODO: Add opacity for non-selected countries if there is some country selected.
+                    # TODO: Add color corresponding to which part of the world country belongs. Hint: COUNTIRES_MAPPING
                     "line": {"width": 2},
                 },
                 name="",  # hide trace-39 etc
@@ -354,8 +352,7 @@ def player_state(play_clicks, pause_clicks, year_value, current_state, year_max)
 def create_interval(play_state):
     if play_state:
         play_state = json.loads(play_state)["state"]
-    if play_state:
-        return [dcc.Interval(id="play_interval", interval=1 * 1000)]
+    # TODO When playing is on, return interval with id 'play_interval'
     return []
 
 
@@ -375,8 +372,9 @@ def increase_year(n_intervals, play_state, year_value, year_max, year_min):
 
     if year_value == year_max and play_state:
         return year_min
-    if play_state:
-        return min(year_value + 1, year_max)
+
+    # TODO When playing is on, return year value increased by 1 year.
+    #   Do not increase too much (HINT: year_max).
     return year_value
 
 

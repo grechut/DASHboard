@@ -118,7 +118,11 @@ app.layout = html.Div(
             children=[
                 html.Div(
                     id="year_slider_container",
-                    children=[dcc.Slider(id="year_slider", value=0)],
+                    children=[
+                        dcc.Slider(
+                            id="year_slider", value=len(init_config["years"]) - 1
+                        )
+                    ],
                 )
             ],
             style={"margin": "0 40px"},
