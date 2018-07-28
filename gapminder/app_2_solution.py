@@ -30,9 +30,6 @@ init_config = get_config(
 app = dash.Dash(__name__)
 app.title = "Poor man's Gapminder"
 
-# Journey begins
-app.config["suppress_callback_exceptions"] = True
-
 
 # Add Materialize CSS for friendly styling
 app.css.append_css(
@@ -136,11 +133,15 @@ app.layout = html.Div(
 # Inputs:
 # x axis (x_axis_selection)
 # y axis (y_axis_selection)
-
-# @app.callback(
-#     # year_slider_container needed because we need to update multiple properties of slider
-# )
-def update_year_slider():
+@app.callback(
+    # year_slider_container needed because we need to update multiple properties of slider
+    Output("year_slider_container", "children"),
+    [
+        Input(component_id="x_axis_selection", component_property="value"),
+        Input(component_id="y_axis_selection", component_property="value"),
+    ],
+)
+def update_year_slider(x_axis_selection, y_axis_selection):
     if not x_axis_selection or not y_axis_selection:
         return []
 
@@ -159,6 +160,15 @@ def update_year_slider():
     return [
         html.Label("Year"),
         # TODO: return slider with properly set properties (id, min, max, value, marks)
+        dcc.Slider(
+            id="year_slider",
+            min=0,
+            max=len(years) - 1,
+            value=len(years) - 1,
+            marks=marks,
+            updatemode="drag",
+            dots=False,
+        ),
     ]
 
 
@@ -167,13 +177,15 @@ def update_year_slider():
 # Add inputs:
 # x_axis (x_axis_selection)
 # y_axis (y_axis_selection)
-
-# @app.callback(
-#     [
-#         Input(component_id="year_slider", component_property="value"),
-#     ],
-# )
-def update_chart():
+@app.callback(
+    Output("main_chart", "figure"),
+    [
+        Input(component_id="x_axis_selection", component_property="value"),
+        Input(component_id="y_axis_selection", component_property="value"),
+        Input(component_id="year_slider", component_property="value"),
+    ],
+)
+def update_chart(x_axis_selection, y_axis_selection, year_idx):
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
@@ -183,6 +195,7 @@ def update_chart():
         y_axis_selection,
         supported_countries=SUPPORTED_COUNTRIES,
     )
+
     year = config["years"][year_idx]
 
     return {
@@ -252,6 +265,27 @@ def update_hist_chart(x_axis_selection, y_axis_selection, year_idx):
                 ),
                 # TODO:
                 # Implement histogram for x-axis
+                html.Div(
+                    dcc.Graph(
+                        id="x_hist",
+                        figure={
+                            "data": [
+                                go.Histogram(
+                                    x=data[x_axis_selection][year],
+                                    nbinsx=10,
+                                    opacity=0.5,
+                                )
+                            ],
+                            "layout": {
+                                "title": x_axis_selection,
+                                "titlefont": {"size": 12},
+                                "height": 250,
+                                "margin": {"l": 30, "b": 30, "t": 30, "r": 30},
+                                "yaxis": {"showticklabels": False},
+                            },
+                        },
+                    )
+                ),
             ],
         )
     ]
