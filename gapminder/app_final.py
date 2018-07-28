@@ -213,6 +213,9 @@ def update_chart(x_axis_selection, y_axis_selection, year_idx, countries_selecti
         y_axis_selection,
         supported_countries=SUPPORTED_COUNTRIES,
     )
+
+    # one of axis is updated but slider is still not updated
+    year_idx = min(len(config["years"]) - 1, year_idx)
     year = config["years"][year_idx]
 
     marker_sizer = CircleMarkerSizer(config["z_df"][year])
@@ -265,6 +268,9 @@ def update_hist_chart(x_axis_selection, y_axis_selection, year_idx):
         y_axis_selection,
         supported_countries=SUPPORTED_COUNTRIES,
     )
+
+    # one of axis is updated but slider is still not updated
+    year_idx = min(len(config["years"]) - 1, year_idx)
     year = config["years"][year_idx]
 
     return [
