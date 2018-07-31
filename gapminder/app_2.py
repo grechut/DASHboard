@@ -9,7 +9,7 @@ import plotly.graph_objs as go
 import pandas as pd
 
 from data import load_data, get_config, get_countires_mapping
-from app_utils import CircleMarkerSizer, options, get_axis
+from utils import CircleMarkerSizer, options, get_axis
 
 
 # Loading data

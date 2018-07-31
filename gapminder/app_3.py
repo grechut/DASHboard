@@ -10,7 +10,7 @@ import pandas as pd
 from flask_caching import Cache
 
 from data import load_data, get_config, get_countires_mapping
-from app_utils import CircleMarkerSizer, options, get_axis
+from utils import CircleMarkerSizer, options, get_axis
 
 
 # Loading data

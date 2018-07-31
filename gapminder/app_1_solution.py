@@ -4,7 +4,7 @@ import dash_html_components as html
 import plotly.graph_objs as go
 
 from data import load_data, get_config, get_countires_mapping
-from app_utils import options
+from utils import options
 
 
 # Loading data
