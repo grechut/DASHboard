@@ -15,10 +15,9 @@ from utils import options
 app = dash.Dash(__name__)
 app.title = "Hello advanced Dash"
 
-
+## State & interval
 # "With Great Power Comes Great Responsibility" - Uncle Ben, Spiderman
 # app.config["suppress_callback_exceptions"] = True
-
 
 app.layout = html.Div(
     [
@@ -36,7 +35,6 @@ app.layout = html.Div(
         # html.H1(id="some_header"),
     ]
 )
-
 
 # @app.callback(
 #     Output("shared_state", "children"),
@@ -109,12 +107,56 @@ app.layout = html.Div(
 #     return []
 
 
-# TODO: Add
-# * Heavier customisation of chart (colour, size, opacity, text)
-#     * Log axis?
-#     * Animate
-# * Explain cache
+## Graph customization
+# app.layout = html.Div(
+#     [
+#         dcc.Graph(
+#             id="new_graph",
+#             figure={
+#                 "data": [
+#                     go.Scatter(
+#                         x=[x],
+#                         y=[y],
+#                         marker={
+#                             "size": 50,
+#                             "opacity": 1 if (x % 2 == 0) else 0.1,
+#                             "color": "red",
+#                         },
+#                         name="",
+#                     )
+#                     for x, y in [(1, 3), (2, 5), (4, 2)]
+#                 ],
+#                 "layout": {"showlegend": False},
+#             },
+#         )
+#     ]
+# )
 
+# More information about graph styling:
+# https://plot.ly/python/reference/#scatter
+# https://plot.ly/python/reference/#layout
+
+
+## Caching
+# from flask_caching import Cache
+
+# cache = Cache(app.server, config={"CACHE_TYPE": "simple"})
+
+
+# @cache.memoize(10)
+# def get_cached_value(start, stop):
+#     return randint(start, stop)
+
+
+# app.layout = html.Div(
+#     [
+#         html.H1(get_cached_value(1, 100)),
+#         html.H1(get_cached_value(1, 100)),
+#         html.H1(get_cached_value(1, 100)),
+#         html.H1(get_cached_value(1, 100)),
+#         html.H1(get_cached_value(1, 101)),
+#     ]
+# )
 
 if __name__ == "__main__":
     app.run_server(debug=True)
