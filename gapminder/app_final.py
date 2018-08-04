@@ -1,3 +1,4 @@
+import os
 import json
 from collections import defaultdict
 
@@ -7,6 +8,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
+from flask import send_from_directory
 from flask_caching import Cache
 
 from data import load_data, get_config, get_countires_mapping
@@ -44,21 +46,31 @@ def get_config_cached(*args, **kwargs):
 
 
 # Add Materialize CSS for friendly styling
-app.css.append_css(
-    {
-        "external_url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"
-    }
-)
-app.scripts.append_script(
-    {
-        "external_url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"
-    }
-)
+# app.css.append_css(
+#     {
+#         "external_url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"
+#     }
+# )
+# app.scripts.append_script(
+#     {
+#         "external_url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"
+#     }
+# )
+
+app.css.config.serve_locally = True
+app.scripts.config.serve_locally = True
+
+
+@app.server.route("/static/<path:path>")
+def static_file(path):
+    static_folder = os.path.join(os.getcwd(), "static")
+    return send_from_directory(static_folder, path)
 
 
 # Layout
 app.layout = html.Div(
     [
+        html.Link(rel="stylesheet", href="/static/materialize.min.css"),
         html.Div(
             className="row",
             children=[

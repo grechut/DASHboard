@@ -1,0 +1,8 @@
+https://github.com/plotly/dash/pull/286/files
+
+TODO:
+
+- Bump Dash version
+- Switch to new way of local assets
+
+But is it worth chasing? Maybe everybody will have internet.. And we will have style file cached locally in browser.
