@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# OSX
+.DS_Store
+
+# VS code
+settings.json
+
+# Plotly demo
+temp-plot.html
