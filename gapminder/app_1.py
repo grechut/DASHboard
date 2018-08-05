@@ -85,7 +85,7 @@ app.layout = html.Div(
                         dcc.Graph(
                             id="main_chart",
                             # TODO:
-                            #     Add here chart like in "Plotly" chapter.
+                            #     Add here chart like in "First Graphs" exercise.
                         )
                     ],
                 )
