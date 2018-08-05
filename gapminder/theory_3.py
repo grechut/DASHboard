@@ -107,36 +107,6 @@ app.layout = html.Div(
 #     return []
 
 
-## Graph customization
-# app.layout = html.Div(
-#     [
-#         dcc.Graph(
-#             id="new_graph",
-#             figure={
-#                 "data": [
-#                     go.Scatter(
-#                         x=[x],
-#                         y=[y],
-#                         marker={
-#                             "size": 50,
-#                             "opacity": 1 if (x % 2 == 0) else 0.1,
-#                             "color": "red",
-#                         },
-#                         name="",
-#                     )
-#                     for x, y in [(1, 3), (2, 5), (4, 2)]
-#                 ],
-#                 "layout": {"showlegend": False},
-#             },
-#         )
-#     ]
-# )
-
-# More information about graph styling:
-# https://plot.ly/python/reference/#scatter
-# https://plot.ly/python/reference/#layout
-
-
 ## Caching
 # from flask_caching import Cache
 
