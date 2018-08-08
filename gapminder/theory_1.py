@@ -74,7 +74,7 @@ app.layout = html.Div(
 #     [
 #         # html.Div(
 #         #     [html.H1("Styling hello")],
-#         #     style={"width": "200px", "background-color": "red", "margin-top": "100px"},
+#         #     # style={"width": "200px", "background-color": "red", "margin-top": "100px"},
 #         # ),
 #         # html.Div(
 #         #     [
