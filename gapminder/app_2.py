@@ -30,9 +30,6 @@ init_config = get_config(
 app = dash.Dash(__name__)
 app.title = "Poor man's Gapminder"
 
-# Journey begins
-app.config["suppress_callback_exceptions"] = True
-
 
 # Add Materialize CSS for friendly styling
 app.css.append_css(
