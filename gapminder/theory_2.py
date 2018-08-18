@@ -18,16 +18,16 @@ app.layout = html.Div(
         # dcc.Dropdown(
         #     id="my_first_dropdown", options=options(["gdp", "population"]), value="gdp"
         # ),
-        # # html.H1(id="dropdown_value"),
-        # # # dcc.Dropdown(
-        # # #     id="my_second_dropdown",
-        # # #     options=options(["Poland", "Not Poland"]),
-        # # #     value="Poland",
-        # # # ),
-        # # # # html.Div(id="fully_new_element_container"),
-        # # # # # When you want to dynamically update component that later affects other components
-        # # # # # html.Div(id="slider_container", children=[dcc.Slider(id="super_slider")]),
-        # # # # # # html.Div(id="slider_affected_part"),
+        # html.H1(id="dropdown_value"),
+        # # dcc.Dropdown(
+        # #     id="my_second_dropdown",
+        # #     options=options(["Poland", "Not Poland"]),
+        # #     value="Poland",
+        # # ),
+        # # html.Div(id="fully_new_element_container"),
+        # # # When you want to dynamically update component that later affects other components
+        # # # html.Div(id="slider_container", children=[dcc.Slider(id="super_slider")]),
+        # # # html.Div(id="slider_affected_part"),
     ]
 )
 
@@ -65,11 +65,11 @@ app.layout = html.Div(
 #     return dcc.Slider(id="super_slider", min=0, max=10, value=randint(0, 10))
 
 
-# # @app.callback(
-# #     Output("slider_affected_part", "children"), [Input("super_slider", "value")]
-# # )
-# # def update_slider_affected_part(slider_value):
-# #     return html.H1(f"Slider value: {slider_value}")
+# @app.callback(
+#     Output("slider_affected_part", "children"), [Input("super_slider", "value")]
+# )
+# def update_slider_affected_part(slider_value):
+#     return html.H1(f"Slider value: {slider_value}")
 
 
 if __name__ == "__main__":
