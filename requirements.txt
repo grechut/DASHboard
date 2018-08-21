@@ -4,6 +4,7 @@ dash-html-components==0.10.0
 dash-renderer==0.12.1
 Flask-Caching==1.4.0
 jupyter==1.0.0
+numpy==1.14.1
 pandas==0.22.0
 plotly==2.5.1
 xlrd==1.1.0
