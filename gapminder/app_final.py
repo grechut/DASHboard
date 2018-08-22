@@ -189,7 +189,6 @@ def update_year_slider(x_axis_selection, y_axis_selection):
             value=len(years) - 1,
             marks=marks,
             updatemode="drag",
-            dots=False,
         ),
     ]
 

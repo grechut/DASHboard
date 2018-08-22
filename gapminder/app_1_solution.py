@@ -117,8 +117,6 @@ app.layout = html.Div(
                 html.Div(
                     className="col l6 m6 s6",
                     children=[
-                        # TODO:
-                        #     Create dropdown that handles selection for x axis.
                         html.Label("X Axis"),
                         dcc.Dropdown(
                             id="x_axis_selection",
@@ -139,7 +137,7 @@ app.layout = html.Div(
                         dcc.Slider(
                             id="year_slider",
                             # TODO:
-                            #     Add slider min, max, labels, value
+                            #     Set min, max, labels, value for slider using init_config
                             min=0,
                             max=len(YEARS) - 1,
                             value=len(YEARS) - 1,
@@ -147,8 +145,6 @@ app.layout = html.Div(
                                 i: year if i % 5 == 0 else ""
                                 for i, year in enumerate(YEARS)
                             },
-                            updatemode="drag",
-                            dots=False,
                         )
                     ],
                 )
@@ -157,8 +153,6 @@ app.layout = html.Div(
         ),
     ]
 )
-
-# TODO Ask questions about places you do not 100% get. Be direct ;)
 
 
 if __name__ == "__main__":

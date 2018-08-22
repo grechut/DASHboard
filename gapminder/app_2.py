@@ -129,10 +129,11 @@ app.layout = html.Div(
 
 
 # TODO:
-# Output: year slider container (year_slider_container)
-# Inputs:
-# x axis (x_axis_selection)
-# y axis (y_axis_selection)
+# Add Output:
+#   year slider container (year_slider_container)
+# Add Inputs:
+#   x axis (x_axis_selection)
+#   y axis (y_axis_selection)
 
 # @app.callback(
 #     # year_slider_container needed because we need to update multiple properties of slider
@@ -160,17 +161,18 @@ def update_year_slider():
 
 
 # TODO
-# Add Output to main_chart
-# Add inputs:
-# x_axis (x_axis_selection)
-# y_axis (y_axis_selection)
+# Add Inputs:
+#   x_axis (x_axis_selection)
+#   y_axis (y_axis_selection)
 
 # @app.callback(
+#     Output("main_chart", "figure"),
 #     [
+#         ...
 #         Input(component_id="year_slider", component_property="value"),
 #     ],
 # )
-def update_chart():
+def update_chart(year_idx):
     if not x_axis_selection or not y_axis_selection or year_idx is None:
         return
 
@@ -253,8 +255,27 @@ def update_hist_chart(x_axis_selection, y_axis_selection, year_idx):
                         },
                     )
                 ),
-                # TODO:
-                # Implement histogram for x-axis
+                html.Div(
+                    dcc.Graph(
+                        id="x_hist",
+                        figure={
+                            "data": [
+                                go.Histogram(
+                                    x=data[x_axis_selection][year],
+                                    nbinsx=10,
+                                    opacity=0.5,
+                                )
+                            ],
+                            "layout": {
+                                "title": x_axis_selection,
+                                "titlefont": {"size": 12},
+                                "height": 250,
+                                "margin": {"l": 30, "b": 30, "t": 30, "r": 30},
+                                "yaxis": {"showticklabels": False},
+                            },
+                        },
+                    )
+                ),
             ],
         )
     ]

@@ -38,8 +38,8 @@ app.config["suppress_callback_exceptions"] = True
 cache = Cache(app.server, config={"CACHE_TYPE": "simple"})
 
 
-# TODO Implement proper cached get_config_cached
-#   This one below is NOT CACHED :)
+# TODO Implement cached version of get_config and call it 'get_config_cached'.
+#   The one below is NOT CACHED :)
 get_config_cached = get_config
 
 
@@ -189,7 +189,6 @@ def update_year_slider(x_axis_selection, y_axis_selection):
             value=len(years) - 1,
             marks=marks,
             updatemode="drag",
-            dots=False,
         ),
     ]
 

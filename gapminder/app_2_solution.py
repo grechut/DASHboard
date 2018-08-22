@@ -129,10 +129,11 @@ app.layout = html.Div(
 
 
 # TODO:
-# Output: year slider container (year_slider_container)
-# Inputs:
-# x axis (x_axis_selection)
-# y axis (y_axis_selection)
+# Add Output:
+#   year slider container (year_slider_container)
+# Add Inputs:
+#   x axis (x_axis_selection)
+#   y axis (y_axis_selection)
 @app.callback(
     # year_slider_container needed because we need to update multiple properties of slider
     Output("year_slider_container", "children"),
@@ -167,16 +168,14 @@ def update_year_slider(x_axis_selection, y_axis_selection):
             value=len(years) - 1,
             marks=marks,
             updatemode="drag",
-            dots=False,
         ),
     ]
 
 
 # TODO
-# Add Output to main_chart
-# Add inputs:
-# x_axis (x_axis_selection)
-# y_axis (y_axis_selection)
+# Add Inputs:
+#   x_axis (x_axis_selection)
+#   y_axis (y_axis_selection)
 @app.callback(
     Output("main_chart", "figure"),
     [
@@ -268,8 +267,6 @@ def update_hist_chart(x_axis_selection, y_axis_selection, year_idx):
                         },
                     )
                 ),
-                # TODO:
-                # Implement histogram for x-axis
                 html.Div(
                     dcc.Graph(
                         id="x_hist",
