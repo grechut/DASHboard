@@ -116,7 +116,7 @@ app.layout = html.Div(
                     children=[
                         dcc.Slider(id="year_slider")
                         # TODO:
-                        #     Set min, max, labels, value for slider using init_config
+                        #     Set min, max, marks, value for slider using init_config
                     ],
                 )
             ],
