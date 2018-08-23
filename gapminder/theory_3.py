@@ -16,8 +16,6 @@ app = dash.Dash(__name__)
 app.title = "Hello advanced Dash"
 
 ## State
-# "With Great Power Comes Great Responsibility" - Uncle Ben, Spiderman
-# app.config["suppress_callback_exceptions"] = True
 
 app.layout = html.Div(
     [
@@ -82,6 +80,9 @@ app.layout = html.Div(
 #     return json.dumps(shared_state)
 
 ## Interval
+
+# "With Great Power Comes Great Responsibility" - Uncle Ben, Spiderman
+# app.config["suppress_callback_exceptions"] = True
 
 # app.layout = html.Div(
 #     [
