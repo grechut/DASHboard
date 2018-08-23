@@ -15,9 +15,7 @@ from utils import options
 app = dash.Dash(__name__)
 app.title = "Hello advanced Dash"
 
-## State & interval
-# "With Great Power Comes Great Responsibility" - Uncle Ben, Spiderman
-# app.config["suppress_callback_exceptions"] = True
+## State
 
 app.layout = html.Div(
     [
@@ -25,14 +23,6 @@ app.layout = html.Div(
         # html.Button("Plus 2", id="plus_2"),
         # html.Div(id="shared_state"),
         # # html.Div(id="shared_state", style={"display": "none"})
-        # dcc.Interval(id="some_interval", interval=1000),
-        # html.Div(id="interval_container"),
-        # dcc.Dropdown(
-        #     id="interval_handling_dropdown",
-        #     options=options(["go", "no go"]),
-        #     value="no go",
-        # ),
-        # html.H1(id="some_header"),
     ]
 )
 
@@ -88,6 +78,24 @@ app.layout = html.Div(
 #         shared_state['plus2_clicks'] = plus2_clicks
 
 #     return json.dumps(shared_state)
+
+## Interval
+
+# "With Great Power Comes Great Responsibility" - Uncle Ben, Spiderman
+# app.config["suppress_callback_exceptions"] = True
+
+# app.layout = html.Div(
+#     [
+#         dcc.Interval(id="some_interval", interval=1000),
+#         # html.Div(id="interval_container"),
+#         # dcc.Dropdown(
+#         #     id="interval_handling_dropdown",
+#         #     options=options(["go", "no go"]),
+#         #     value="no go",
+#         # ),
+#         html.H1(id="some_header"),
+#     ]
+# )
 
 
 # @app.callback(

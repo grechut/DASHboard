@@ -1,11 +1,4 @@
-# Data for dashboard #1
-
-data["Total population"]["2000"]
-data["Total population"]["2000"].loc["Poland"]
-# or
-data["Total population"].loc["Poland", "2000"]
-
-# Data for dashboard #2
+# Data for dashboard
 
 life_murder_conf = get_config(
     data, "Life expectancy", "Murder per 100,000, age adjusted"
